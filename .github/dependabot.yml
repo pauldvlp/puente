@@ -5,6 +5,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # pnpm 11 defaults to minimumReleaseAge: 1440 (24h) and CI enforces it, so a bump
+    # proposed minutes after a release fails `pnpm install --frozen-lockfile` with
+    # ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION. Wait past that window before proposing.
+    cooldown:
+      default-days: 2
     commit-message:
       prefix: build
       prefix-development: build
@@ -23,6 +28,10 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    # Let a fresh action release be exercised by other repos first — a same-day major
+    # landed here broken once (pnpm/action-setup@v6 crashed self-installing pnpm 11.12).
+    cooldown:
+      default-days: 2
     commit-message:
       prefix: ci
     ignore:
