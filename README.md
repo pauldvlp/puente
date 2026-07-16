@@ -73,7 +73,7 @@ packages/
 
 ## Development
 
-Requires Node ≥ 20 and pnpm ≥ 11. See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for the full guide.
+Requires Node ≥ 22.13 (pnpm 11 needs it) and pnpm ≥ 11 for development — the published tool runs on Node ≥ 20. See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for the full guide.
 
 ```bash
 pnpm install

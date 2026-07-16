@@ -21,7 +21,8 @@ For anything security-related, **do not open a public issue** — follow
 
 ## Prerequisites
 
-- **Node.js ≥ 20.10**
+- **Node.js ≥ 22.13** — required by pnpm 11 for local development. (The published
+  `puente` package itself runs on Node ≥ 20.)
 - **pnpm ≥ 11** (`corepack enable` then `corepack use pnpm@latest`, or `npm i -g pnpm`)
 - **git**
 - A C/C++ toolchain + Python only if `better-sqlite3` has to build from source on
