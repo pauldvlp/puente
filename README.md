@@ -33,17 +33,26 @@ npm install -g puente && puente
 ## Install
 
 ```bash
-# Run once, no install
+# Run once, no install (npm builds the native deps for you — no prompts)
 npx puente
 
 # Global install (pick your package manager)
 npm  install -g puente      # then: puente
-pnpm add     -g puente
+pnpm add     -g puente      # then: pnpm approve-builds -g   (see note below)
 bun  add     -g puente
 
 # Or self-host with Docker
 docker compose up -d       # panel on http://localhost:5006
 ```
+
+> **Using pnpm?** Since pnpm 10, dependency build scripts are blocked by default, so
+> pnpm asks to approve the native deps (`better-sqlite3`, `ssh2`, `cpu-features`).
+> After a global install, approve them once with `pnpm approve-builds -g`. For a one-off
+> run, pre-approve them inline so it stays non-interactive:
+>
+> ```bash
+> pnpm --allow-build=better-sqlite3,ssh2,cpu-features dlx puente
+> ```
 
 Then open **http://localhost:5006** — the first screen walks you through everything.
 See the [full setup guide](apps/server/README.md#first-run-setup-about-2-minutes),
