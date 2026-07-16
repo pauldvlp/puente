@@ -3,6 +3,9 @@ name: Release
 on:
   push:
     branches: [main]
+  # Escape hatch: publish the version currently checked out, without cutting a new
+  # release. Use it when a release was tagged but never reached npm.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -11,9 +14,14 @@ permissions:
 jobs:
   release-please:
     name: Prepare release
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    # release-please namespaces its outputs by package path, so a manifest with
+    # packages under apps/server emits `apps/server--release_created` — never a bare
+    # `release_created` (that only exists when the package sits at the repo root).
+    # Reading the bare name yielded an empty string, so publish silently skipped.
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
+      release_created: ${{ steps.release.outputs['apps/server--release_created'] }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
@@ -24,7 +32,9 @@ jobs:
   publish:
     name: Publish to npm
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    # always(): on workflow_dispatch the release-please job is skipped, and a skipped
+    # dependency would otherwise skip this one too.
+    if: ${{ always() && (needs.release-please.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
