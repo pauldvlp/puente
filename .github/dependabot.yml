@@ -10,9 +10,13 @@ updates:
     # ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION. Wait past that window before proposing.
     cooldown:
       default-days: 2
+    # Runtime deps ship inside the published package, so a bump there must be able to
+    # reach npm on its own — `fix(deps)` cuts a patch release. devDependencies never
+    # ship, so `chore(deps-dev)` stays hidden and releases nothing.
     commit-message:
-      prefix: build
-      prefix-development: build
+      prefix: fix
+      prefix-development: chore
+      include: scope
     ignore:
       # Major npm bumps break this project and must be done by hand once the code
       # is adapted: TypeScript is pinned to 5.x (NestJS needs tsc's decorator

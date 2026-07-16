@@ -13,7 +13,7 @@ Instead, use one of these private channels:
 
 - **GitHub Security Advisories** — preferred:
   [Report a vulnerability](https://github.com/pauldvlp/puente/security/advisories/new)
-- **Email** — paulbh.dev@gmail.com
+- **Email** — johanpaulbarahona@gmail.com
 
 Please include:
 

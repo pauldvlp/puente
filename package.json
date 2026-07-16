@@ -5,7 +5,7 @@
   "description": "Monorepo workspace for puente — centralized Cloudflare Tunnel manager",
   "type": "module",
   "license": "MIT",
-  "author": "pauldvlp <paulbh.dev@gmail.com>",
+  "author": "Paul Barahona <johanpaulbarahona@gmail.com>",
   "homepage": "https://github.com/pauldvlp/puente#readme",
   "repository": {
     "type": "git",
