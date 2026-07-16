@@ -7,6 +7,11 @@ on:
   # release. Use it when a release was tagged but never reached npm.
   workflow_dispatch:
 
+# Never let two releases race: cutting a tag and publishing must not interleave.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 permissions:
   contents: write
   pull-requests: write
@@ -40,20 +45,26 @@ jobs:
       contents: read
       id-token: write # required for OIDC trusted publishing (tokenless) + provenance
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # pnpm comes from corepack, pinned by `packageManager`. The second setup-node
+      # wires up the store cache, which needs pnpm to already be on PATH.
+      - run: corepack enable
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
       # Trusted publishing (OIDC) needs npm >= 11.5.1, newer than the one bundled
-      # with Node 22. No NPM_TOKEN anywhere — auth comes from the OIDC id-token.
+      # with Node 24. No NPM_TOKEN anywhere — auth comes from the OIDC id-token.
       - name: Ensure npm supports trusted publishing
         run: npm install -g npm@latest
 

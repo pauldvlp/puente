@@ -10,22 +10,62 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
+  commitlint:
+    name: Commit messages
+    # main is rebase-only, so every commit on a PR lands verbatim — lint each one.
+    # Linting the PR title instead would check a string rebase never turns into a commit.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint the commits this PR adds
+        run: >-
+          pnpm exec commitlint
+          --from ${{ github.event.pull_request.base.sha }}
+          --to ${{ github.event.pull_request.head.sha }}
+          --verbose
+
   build:
     name: Typecheck & build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      # pnpm 11 requires Node >= 22.13, so the build toolchain runs on Node 22.
-      # (The published package itself still runs on Node >= 20 — see the smoke job.)
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      # Node 24 runs the toolchain. The published package still supports Node >= 20,
+      # which the smoke job proves against the real tarball.
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
+
+      # pnpm comes from corepack, pinned by `packageManager` in package.json — no
+      # third-party action in the path. The second setup-node is what wires up the
+      # store cache: `cache: pnpm` shells out to pnpm, so pnpm must exist by then.
+      - run: corepack enable
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
@@ -44,7 +84,7 @@ jobs:
         run: npm pack --pack-destination "$RUNNER_TEMP"
 
       - name: Upload tarball
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: puente-tarball
           path: ${{ runner.temp }}/puente-*.tgz
@@ -60,13 +100,13 @@ jobs:
         node: [20, 22]
     steps:
       - name: Download tarball
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: puente-tarball
           path: pkg
 
       - name: Setup Node ${{ matrix.node }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
 
