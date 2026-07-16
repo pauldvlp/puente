@@ -1,6 +1,6 @@
 {
   "name": "puente",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Centralized, self-hosted manager for Cloudflare Tunnels across your machines — expose local ports on your own subdomains, orchestrate remote nodes over SSH.",
   "license": "MIT",
   "author": "pauldvlp <paulbh.dev@gmail.com>",
