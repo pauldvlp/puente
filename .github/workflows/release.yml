@@ -30,7 +30,7 @@ jobs:
       contents: read
       id-token: write # required for OIDC trusted publishing (tokenless) + provenance
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
