@@ -24,9 +24,15 @@ npx puente
 
 # Global install (recommended)
 npm  install -g puente      # then:  puente
-pnpm add     -g puente      # then:  puente
+pnpm add     -g puente      # then:  pnpm approve-builds -g  &&  puente
 bun  add     -g puente      # then:  puente
 ```
+
+> **pnpm users:** since pnpm 10, dependency build scripts are blocked by default, so pnpm
+> asks to approve the native deps (`better-sqlite3`, `ssh2`, `cpu-features`). Approve them
+> once after installing with `pnpm approve-builds -g`, or keep a one-off run non-interactive
+> with `pnpm --allow-build=better-sqlite3,ssh2,cpu-features dlx puente`. `npx` and `bun`
+> build them automatically with no prompt.
 
 > The scoped name **`@pauldvlp/puente`** is an identical alias published at the same
 > version — `npx @pauldvlp/puente` works too if you prefer it.
