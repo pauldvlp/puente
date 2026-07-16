@@ -15,15 +15,15 @@ jobs:
     name: Typecheck & build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       # pnpm 11 requires Node >= 22.13, so the build toolchain runs on Node 22.
       # (The published package itself still runs on Node >= 20 — see the smoke job.)
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -44,7 +44,7 @@ jobs:
         run: npm pack --pack-destination "$RUNNER_TEMP"
 
       - name: Upload tarball
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: puente-tarball
           path: ${{ runner.temp }}/puente-*.tgz
@@ -60,13 +60,13 @@ jobs:
         node: [20, 22]
     steps:
       - name: Download tarball
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: puente-tarball
           path: pkg
 
       - name: Setup Node ${{ matrix.node }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
 
