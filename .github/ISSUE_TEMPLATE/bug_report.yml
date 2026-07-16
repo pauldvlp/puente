@@ -1,0 +1,66 @@
+name: 🐛 Bug report
+description: Report a problem with puente
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug! Please fill out the sections below.
+        ⚠️ **Security issue?** Don't file it here — see our [Security Policy](https://github.com/pauldvlp/puente/security/policy).
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `puente ...`
+        2. Click ...
+        3. See error
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: puente version
+      description: Output of `puente info` (or the version you installed).
+    validations:
+      required: true
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: How did you install puente?
+      options:
+        - npm / pnpm / bun global install
+        - npx (one-off)
+        - Docker / docker-compose
+        - From source
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS & Node version
+      placeholder: "e.g. Ubuntu 24.04, Node 20.11"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Paste any error output. **Redact tokens, secrets, and hostnames.**
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this isn't a duplicate.
+          required: true
+        - label: This is not a security vulnerability (those go through the Security Policy).
+          required: true

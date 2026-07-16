@@ -1,0 +1,40 @@
+{
+  "name": "puente-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Monorepo workspace for puente — centralized Cloudflare Tunnel manager",
+  "type": "module",
+  "license": "MIT",
+  "author": "pauldvlp <paulbh.dev@gmail.com>",
+  "homepage": "https://github.com/pauldvlp/puente#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pauldvlp/puente.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pauldvlp/puente/issues"
+  },
+  "packageManager": "pnpm@11.12.0",
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "dev:server": "pnpm --filter puente dev",
+    "dev:web": "pnpm --filter @puente/web dev",
+    "build": "pnpm --filter @puente/shared build && pnpm --filter @puente/web build && pnpm --filter puente build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "start": "pnpm --filter puente start",
+    "sync:alias": "node scripts/sync-alias.mjs",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@types/node": "^22.10.5",
+    "husky": "^9.1.7",
+    "typescript": "^5.7.3"
+  }
+}

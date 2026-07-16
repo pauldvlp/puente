@@ -1,0 +1,42 @@
+{
+  "name": "@pauldvlp/puente",
+  "version": "0.1.0",
+  "description": "Alias for the `puente` package — the self-hosted Cloudflare Tunnel manager. Installs and runs the exact same CLI under a scoped name.",
+  "license": "MIT",
+  "author": "pauldvlp <paulbh.dev@gmail.com>",
+  "homepage": "https://github.com/pauldvlp/puente#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pauldvlp/puente.git",
+    "directory": "packages/alias"
+  },
+  "bugs": {
+    "url": "https://github.com/pauldvlp/puente/issues"
+  },
+  "keywords": [
+    "cloudflare",
+    "cloudflare-tunnel",
+    "cloudflared",
+    "tunnel",
+    "self-hosted",
+    "puente"
+  ],
+  "bin": {
+    "puente": "bin/puente.js"
+  },
+  "files": [
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "puente": "workspace:*"
+  }
+}

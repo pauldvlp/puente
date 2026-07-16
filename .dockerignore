@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/*.tsbuildinfo
+.git
+.github
+.claude
+.playwright-mcp
+.pnpm-store
+.puente
+*.log
+coverage

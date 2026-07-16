@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/pauldvlp/puente/security/advisories/new
+    about: Please report security issues privately — never as a public issue.
+  - name: 💬 Questions & discussion
+    url: https://github.com/pauldvlp/puente/discussions
+    about: Ask questions, share setups, and discuss ideas.

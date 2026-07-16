@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+apps/web/dist/
+apps/server/dist/
+
+# Local runtime data (never commit secrets/DB)
+.puente/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+*.key
+!**/keys/.gitkeep
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Local agent / tooling state (not for the public repo)
+.claude/settings.local.json
+.playwright-mcp/
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Codegraph
+.codegraph/

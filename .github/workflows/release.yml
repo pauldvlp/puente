@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    name: Publish to npm
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for OIDC trusted publishing (tokenless) + provenance
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      # Trusted publishing (OIDC) needs npm >= 11.5.1, newer than the one bundled
+      # with Node 22. No NPM_TOKEN anywhere — auth comes from the OIDC id-token.
+      - name: Ensure npm supports trusted publishing
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      # No --provenance flag and no token: with trusted publishing npm authenticates
+      # via OIDC and generates provenance automatically. Public access comes from each
+      # package's publishConfig.
+      - name: Publish puente
+        working-directory: apps/server
+        run: npm publish
+
+      - name: Publish @pauldvlp/puente (alias, version-locked to puente)
+        run: |
+          node scripts/sync-alias.mjs
+          cd packages/alias
+          npm publish
