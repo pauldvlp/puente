@@ -8,8 +8,15 @@ updates:
     commit-message:
       prefix: build
       prefix-development: build
+    ignore:
+      # Major npm bumps break this project and must be done by hand once the code
+      # is adapted: TypeScript is pinned to 5.x (NestJS needs tsc's decorator
+      # metadata — TS 7/tsgo breaks DI); commander must stay CommonJS; the zod 3
+      # schemas and cloudflare v6 SDK usage would need migration. Auto only minor/patch.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
-      dependencies:
+      npm:
         patterns: ["*"]
 
   - package-ecosystem: github-actions
@@ -18,3 +25,10 @@ updates:
       interval: weekly
     commit-message:
       prefix: ci
+    ignore:
+      # release-please drives publishing and isn't exercised by PR CI — bump by hand.
+      - dependency-name: "googleapis/release-please-action"
+        update-types: ["version-update:semver-major"]
+    groups:
+      github-actions:
+        patterns: ["*"]
