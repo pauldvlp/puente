@@ -26,7 +26,9 @@ export function ActivityPage() {
     <div className="mx-auto w-full max-w-[1100px] px-5 pb-16 pt-6 sm:px-7">
       <header className="mb-5">
         <h1 className="text-2xl font-bold tracking-tight">Activity</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Everything puente has done, newest first.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Everything puente has done, newest first.
+        </p>
       </header>
 
       {events.isLoading ? (
@@ -57,7 +59,9 @@ export function ActivityPage() {
 function Row({ event, last }: { event: ActivityEvent; last: boolean }) {
   const { icon: Icon, className } = ICONS[event.level];
   return (
-    <div className={`flex items-center gap-3.5 px-5 py-3.5 transition-colors hover:bg-muted/50 ${last ? '' : 'border-b'}`}>
+    <div
+      className={`flex items-center gap-3.5 px-5 py-3.5 transition-colors hover:bg-muted/50 ${last ? '' : 'border-b'}`}
+    >
       <Icon className={`size-[17px] shrink-0 ${className}`} />
       <div className="flex min-w-0 flex-col">
         <span className="text-sm">{event.message}</span>
@@ -65,7 +69,9 @@ function Row({ event, last }: { event: ActivityEvent; last: boolean }) {
           {event.action} · {absoluteTime(event.ts)}
         </span>
       </div>
-      <span className="ml-auto whitespace-nowrap text-xs text-muted-foreground">{relativeTime(event.ts)}</span>
+      <span className="ml-auto whitespace-nowrap text-xs text-muted-foreground">
+        {relativeTime(event.ts)}
+      </span>
     </div>
   );
 }

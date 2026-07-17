@@ -9,12 +9,7 @@ import {
   Waypoints,
 } from 'lucide-react';
 import type { ActivityEvent } from '@puente/shared';
-import {
-  useCloudflareConnection,
-  useEvents,
-  useNodes,
-  useRoutes,
-} from '../lib/hooks';
+import { useCloudflareConnection, useEvents, useNodes, useRoutes } from '../lib/hooks';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { StatusBadge } from '../components/ui/extras';
@@ -37,7 +32,10 @@ export function DashboardPage() {
 
   const steps = [
     { label: 'Connect Cloudflare', done: connected },
-    { label: 'Add & provision a node', done: nodeList.some((n) => n.provisionState === 'provisioned') },
+    {
+      label: 'Add & provision a node',
+      done: nodeList.some((n) => n.provisionState === 'provisioned'),
+    },
     { label: 'Publish a route', done: routeList.length > 0 },
   ];
   const allDone = steps.every((s) => s.done);
@@ -47,7 +45,9 @@ export function DashboardPage() {
       <header className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {cf.data?.account ? `Connected to ${cf.data.account.name}` : 'Your Cloudflare Tunnel control plane'}
+          {cf.data?.account
+            ? `Connected to ${cf.data.account.name}`
+            : 'Your Cloudflare Tunnel control plane'}
         </p>
       </header>
 
@@ -103,12 +103,22 @@ export function DashboardPage() {
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Stat icon={<Server className="size-4" />} label="Nodes" value={nodeList.length} sub={`${healthyTunnels} healthy`} />
-        <Stat icon={<Waypoints className="size-4" />} label="Routes" value={routeList.length} sub={`${activeRoutes} active`} />
+        <Stat
+          icon={<Server className="size-4" />}
+          label="Nodes"
+          value={nodeList.length}
+          sub={`${healthyTunnels} healthy`}
+        />
+        <Stat
+          icon={<Waypoints className="size-4" />}
+          label="Routes"
+          value={routeList.length}
+          sub={`${activeRoutes} active`}
+        />
         <Stat
           icon={<Cloud className="size-4" />}
           label="Cloudflare"
-          value={connected ? cf.data?.zones.length ?? 0 : 0}
+          value={connected ? (cf.data?.zones.length ?? 0) : 0}
           sub={connected ? 'domains' : 'not connected'}
           tone={connected ? 'ok' : 'neutral'}
         />
@@ -143,7 +153,10 @@ export function DashboardPage() {
               nodeList.slice(0, 5).map((n, i) => (
                 <div
                   key={n.id}
-                  className={cn('flex items-center gap-3.5 px-5 py-3 transition-colors hover:bg-muted/50', i < Math.min(nodeList.length, 5) - 1 && 'border-b')}
+                  className={cn(
+                    'flex items-center gap-3.5 px-5 py-3 transition-colors hover:bg-muted/50',
+                    i < Math.min(nodeList.length, 5) - 1 && 'border-b',
+                  )}
                 >
                   <Server className="size-4 shrink-0 text-muted-foreground" />
                   <div className="flex min-w-0 grow flex-col">
@@ -208,7 +221,12 @@ function Stat({
         {icon}
         {label}
       </span>
-      <span className={cn('text-[2rem] font-bold leading-none tracking-tight tabular-nums', STAT_TONE[tone])}>
+      <span
+        className={cn(
+          'text-[2rem] font-bold leading-none tracking-tight tabular-nums',
+          STAT_TONE[tone],
+        )}
+      >
         {value}
       </span>
       {sub && <span className="text-xs text-muted-foreground">{sub}</span>}
@@ -232,7 +250,9 @@ function OnboardingCTA({
   return (
     <div className="mt-2 flex items-center justify-between gap-4 rounded-xl bg-muted/60 p-4">
       <div className="flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">{icon}</span>
+        <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
+          {icon}
+        </span>
         <div className="flex flex-col">
           <span className="text-sm font-semibold">{title}</span>
           <span className="text-xs text-muted-foreground">{desc}</span>

@@ -51,7 +51,9 @@ export function SettingsPage() {
     <div className="mx-auto w-full max-w-[1100px] px-5 pb-16 pt-6 sm:px-7">
       <header className="mb-5">
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Cloudflare connection, preferences and about.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Cloudflare connection, preferences and about.
+        </p>
       </header>
 
       {/* Cloudflare */}
@@ -84,7 +86,11 @@ export function SettingsPage() {
                     {!refreshZones.isPending && <RefreshCw className="size-3.5" />}
                     Refresh zones
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => setConfirmDisconnect(true)}>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setConfirmDisconnect(true)}
+                  >
                     <Unplug className="size-3.5" />
                     Disconnect
                   </Button>
@@ -111,7 +117,11 @@ export function SettingsPage() {
         </div>
         <div className="flex flex-col gap-4 p-5">
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Health poll interval (seconds)" hint="How often tunnel status is refreshed." htmlFor="poll">
+            <Field
+              label="Health poll interval (seconds)"
+              hint="How often tunnel status is refreshed."
+              htmlFor="poll"
+            >
               <Input
                 id="poll"
                 type="number"
@@ -183,8 +193,8 @@ export function SettingsPage() {
           <DialogHeader>
             <DialogTitle>Disconnect Cloudflare?</DialogTitle>
             <DialogDescription>
-              The stored API token will be removed. Your tunnels and DNS records stay intact on Cloudflare, but puente
-              won’t be able to manage them until you reconnect.
+              The stored API token will be removed. Your tunnels and DNS records stay intact on
+              Cloudflare, but puente won’t be able to manage them until you reconnect.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -194,7 +204,9 @@ export function SettingsPage() {
             <Button
               variant="destructive"
               loading={disconnect.isPending}
-              onClick={() => disconnect.mutate(undefined, { onSuccess: () => setConfirmDisconnect(false) })}
+              onClick={() =>
+                disconnect.mutate(undefined, { onSuccess: () => setConfirmDisconnect(false) })
+              }
             >
               Disconnect
             </Button>

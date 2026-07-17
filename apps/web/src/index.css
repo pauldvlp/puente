@@ -51,10 +51,10 @@
   --panel: oklch(1 0 0 / 0.48);
   --panel-border: oklch(1 0 0 / 0.55);
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'SF Mono', ui-monospace, 'JetBrains Mono', 'Cascadia Code', Menlo,
-    Consolas, monospace;
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:
+    'SF Mono', ui-monospace, 'JetBrains Mono', 'Cascadia Code', Menlo, Consolas, monospace;
 }
 
 .dark {
@@ -152,7 +152,12 @@
     background-image:
       radial-gradient(1100px 760px at 12% -12%, oklch(0.9 0.065 292 / 0.85), transparent 55%),
       radial-gradient(1000px 720px at 104% -4%, oklch(0.91 0.05 330 / 0.7), transparent 52%),
-      linear-gradient(158deg, oklch(0.95 0.035 290), oklch(0.967 0.02 300) 60%, oklch(0.95 0.03 285));
+      linear-gradient(
+        158deg,
+        oklch(0.95 0.035 290),
+        oklch(0.967 0.02 300) 60%,
+        oklch(0.95 0.03 285)
+      );
     background-attachment: fixed;
   }
 

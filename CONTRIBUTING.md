@@ -22,7 +22,7 @@ For anything security-related, **do not open a public issue** — follow
 ## Prerequisites
 
 - **Node.js ≥ 22.13** — required by pnpm 11 for local development. (The published
-  `puente` package itself runs on Node ≥ 20.)
+  `puente` package itself runs on Node ≥ 22.)
 - **pnpm ≥ 11** (`corepack enable` then `corepack use pnpm@latest`, or `npm i -g pnpm`)
 - **git**
 - A C/C++ toolchain + Python only if `better-sqlite3` has to build from source on
@@ -93,17 +93,17 @@ Format:
 
 Common types:
 
-| Type       | When to use it                                   | Version bump |
-|------------|--------------------------------------------------|--------------|
-| `feat`     | A new feature                                    | minor        |
-| `fix`      | A bug fix                                         | patch        |
-| `docs`     | Documentation only                               | none         |
-| `refactor` | Code change that neither fixes a bug nor adds a feature | none  |
-| `perf`     | Performance improvement                          | patch        |
-| `test`     | Adding or fixing tests                           | none         |
-| `build`    | Build system, dependencies, packaging            | none         |
-| `ci`       | CI configuration                                 | none         |
-| `chore`    | Housekeeping that doesn't touch `src`            | none         |
+| Type       | When to use it                                          | Version bump |
+| ---------- | ------------------------------------------------------- | ------------ |
+| `feat`     | A new feature                                           | minor        |
+| `fix`      | A bug fix                                               | patch        |
+| `docs`     | Documentation only                                      | none         |
+| `refactor` | Code change that neither fixes a bug nor adds a feature | none         |
+| `perf`     | Performance improvement                                 | patch        |
+| `test`     | Adding or fixing tests                                  | none         |
+| `build`    | Build system, dependencies, packaging                   | none         |
+| `ci`       | CI configuration                                        | none         |
+| `chore`    | Housekeeping that doesn't touch `src`                   | none         |
 
 Suggested scopes: `server`, `web`, `shared`, `cli`, `ssh`, `cloudflare`,
 `docker`, `deps`.

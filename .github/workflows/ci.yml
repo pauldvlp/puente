@@ -47,7 +47,7 @@ jobs:
           --verbose
 
   build:
-    name: Typecheck & build
+    name: Lint, typecheck & build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -70,6 +70,12 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
 
       # Build first: @puente/shared must emit its .d.ts before tsc can resolve it
       # (server & web import @puente/shared, which is only typed via its built dist).
@@ -97,7 +103,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22]
+        # Non-EOL only. Node 20 is EOL (2026-04-30); test the floor (22) + current (24).
+        node: [22, 24]
     steps:
       - name: Download tarball
         uses: actions/download-artifact@v8

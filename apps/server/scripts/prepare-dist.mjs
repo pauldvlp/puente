@@ -11,12 +11,17 @@ const serverDir = resolve(__dirname, '..');
 const repoRoot = resolve(serverDir, '../..');
 const distDir = join(serverDir, 'dist');
 
-const exists = (p) => access(p).then(() => true).catch(() => false);
+const exists = (p) =>
+  access(p)
+    .then(() => true)
+    .catch(() => false);
 
 async function inlineShared() {
   const sharedDist = join(repoRoot, 'packages/shared/dist');
   if (!(await exists(sharedDist))) {
-    throw new Error(`@puente/shared is not built (${sharedDist}). Run "pnpm --filter @puente/shared build" first.`);
+    throw new Error(
+      `@puente/shared is not built (${sharedDist}). Run "pnpm --filter @puente/shared build" first.`,
+    );
   }
   const target = join(distDir, 'node_modules/@puente/shared');
   await rm(target, { recursive: true, force: true });

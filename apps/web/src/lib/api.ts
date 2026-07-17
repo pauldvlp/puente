@@ -70,8 +70,15 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
       /* non-JSON error */
     }
     const rawMsg = payload.message;
-    const message = Array.isArray(rawMsg) ? rawMsg.join('\n') : rawMsg || `Request failed (${res.status})`;
-    throw new ApiError(res.status, message, payload.code, Array.isArray(rawMsg) ? rawMsg : undefined);
+    const message = Array.isArray(rawMsg)
+      ? rawMsg.join('\n')
+      : rawMsg || `Request failed (${res.status})`;
+    throw new ApiError(
+      res.status,
+      message,
+      payload.code,
+      Array.isArray(rawMsg) ? rawMsg : undefined,
+    );
   }
 
   if (res.status === 204) return undefined as T;
@@ -125,7 +132,8 @@ export const api = {
     create: (b: CreateNodeInput) => post<PuenteNode>('/nodes', b),
     remove: (id: string) => del<{ ok: true }>(`/nodes/${id}`),
     test: (id: string) => post<SshTestResult>(`/nodes/${id}/test`),
-    bootstrap: (id: string, b: SshBootstrapInput) => post<SshTestResult>(`/nodes/${id}/bootstrap`, b),
+    bootstrap: (id: string, b: SshBootstrapInput) =>
+      post<SshTestResult>(`/nodes/${id}/bootstrap`, b),
     provision: (id: string, b: ProvisionNodeInput) => post<PuenteNode>(`/nodes/${id}/provision`, b),
     connector: (id: string, action: 'start' | 'stop' | 'restart') =>
       post<PuenteNode>(`/nodes/${id}/connector/${action}`),

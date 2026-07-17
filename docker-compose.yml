@@ -5,9 +5,9 @@ services:
     container_name: puente
     restart: unless-stopped
     ports:
-      - "5006:5006"
+      - '5006:5006'
     environment:
-      PUENTE_PORT: "5006"
+      PUENTE_PORT: '5006'
       PUENTE_DATA_DIR: /data
     volumes:
       - puente-data:/data

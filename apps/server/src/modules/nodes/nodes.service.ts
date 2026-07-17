@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import type {
   CreateNodeInput,
@@ -85,7 +80,10 @@ export class NodesService {
           code: 'LOCAL_EXISTS',
         });
       }
-      this.db.insert(nodes).values({ ...base, kind: 'local' }).run();
+      this.db
+        .insert(nodes)
+        .values({ ...base, kind: 'local' })
+        .run();
     } else {
       let host = dto.host;
       let port = dto.port;
@@ -148,9 +146,9 @@ export class NodesService {
     }
     await this.routes.removeForNode(id).catch((e) => this.logger.warn(String(e)));
     if (row.tunnelId) {
-      await this.cloudflare.deleteTunnel(row.tunnelId).catch((e) =>
-        this.logger.warn(`Tunnel delete failed: ${String(e)}`),
-      );
+      await this.cloudflare
+        .deleteTunnel(row.tunnelId)
+        .catch((e) => this.logger.warn(`Tunnel delete failed: ${String(e)}`));
     }
     this.db.delete(nodes).where(eq(nodes.id, id)).run();
     this.events.info('node.delete', `Removed node "${row.name}"`, { nodeId: id });
@@ -305,7 +303,9 @@ export class NodesService {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.setState(id, { provisionState: 'error', lastError: msg });
-      this.events.error('node.provision', `Provisioning "${row.name}" failed: ${msg}`, { nodeId: id });
+      this.events.error('node.provision', `Provisioning "${row.name}" failed: ${msg}`, {
+        nodeId: id,
+      });
       this.bus.progress(scope, 'error', msg, { done: true, error: true });
       this.emitUpdated(id);
       throw err instanceof BadRequestException ? err : new BadRequestException(msg);
@@ -366,7 +366,11 @@ export class NodesService {
   /** Lightweight, SSH-free refresh of tunnel status for all provisioned nodes. */
   async pollTunnelStatuses(): Promise<void> {
     if (!this.settings.isCloudflareConnected()) return;
-    const provisioned = this.db.select().from(nodes).all().filter((n) => n.tunnelId);
+    const provisioned = this.db
+      .select()
+      .from(nodes)
+      .all()
+      .filter((n) => n.tunnelId);
     for (const n of provisioned) {
       try {
         const info = await this.cloudflare.getTunnelInfo(n.tunnelId!);
@@ -418,7 +422,11 @@ export class NodesService {
   }
 
   private setState(id: string, patch: Partial<NodeRow>): void {
-    this.db.update(nodes).set({ ...patch, updatedAt: nowMs() }).where(eq(nodes.id, id)).run();
+    this.db
+      .update(nodes)
+      .set({ ...patch, updatedAt: nowMs() })
+      .where(eq(nodes.id, id))
+      .run();
   }
 
   private emitUpdated(id: string): Node {
@@ -428,7 +436,10 @@ export class NodesService {
   }
 
   private tunnelNameFor(row: NodeRow): string {
-    const slug = row.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const slug = row.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
     return `puente-${slug || 'node'}-${row.id.slice(-6)}`;
   }
 }

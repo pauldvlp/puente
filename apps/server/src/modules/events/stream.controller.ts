@@ -12,7 +12,9 @@ export class StreamController {
   stream(): Observable<MessageEvent> {
     const now = () => new Date().toISOString();
     const hello$ = of<StreamEvent>({ type: 'hello', at: now() });
-    const ping$ = interval(25000).pipe(map<number, StreamEvent>(() => ({ type: 'ping', at: now() })));
+    const ping$ = interval(25000).pipe(
+      map<number, StreamEvent>(() => ({ type: 'ping', at: now() })),
+    );
     const events$ = this.bus.stream$;
     return merge(hello$, events$, ping$).pipe(map((e) => ({ data: e }) as MessageEvent));
   }

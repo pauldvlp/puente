@@ -64,7 +64,11 @@ export function AuthPage({ hasAdmin }: { hasAdmin: boolean }) {
                 placeholder="admin"
               />
             </Field>
-            <Field label="Password" htmlFor="password" hint={isRegister ? 'At least 8 characters.' : undefined}>
+            <Field
+              label="Password"
+              htmlFor="password"
+              hint={isRegister ? 'At least 8 characters.' : undefined}
+            >
               <Input
                 id="password"
                 type="password"

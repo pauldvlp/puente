@@ -10,11 +10,7 @@ import { join } from 'node:path';
 import SSHConfig from 'ssh-config';
 import type { SshConfigHost, SshKey, SshTestResult } from '@puente/shared';
 import { KEYS_DIR } from '../../config/paths';
-import {
-  CommandExecutor,
-  LocalExecutor,
-  ExecResult,
-} from '../../common/executor';
+import { CommandExecutor, LocalExecutor, ExecResult } from '../../common/executor';
 import { shq, normalizeOs, normalizeArch } from '../../common/shell';
 import type { NodeRow } from '../../db/schema';
 
@@ -65,9 +61,7 @@ export class SshService {
   private readonly logger = new Logger(SshService.name);
 
   /** Low-level connect that also captures/pins the host key fingerprint. */
-  private async rawConnect(
-    cfg: RawConnectConfig,
-  ): Promise<{ ssh: NodeSSH; fingerprint: string }> {
+  private async rawConnect(cfg: RawConnectConfig): Promise<{ ssh: NodeSSH; fingerprint: string }> {
     const ssh = new NodeSSH();
     let fingerprint = '';
     let rejected = false;

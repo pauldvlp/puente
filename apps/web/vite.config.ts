@@ -14,7 +14,9 @@ const API_TARGET = process.env.PUENTE_API_TARGET ?? 'http://localhost:5006';
 // (This only affects `vite` dev/preview — production is served by the NestJS
 // server, which has no Host restriction.)
 const ALLOWED_HOSTS: true | string[] = process.env.PUENTE_ALLOWED_HOSTS
-  ? process.env.PUENTE_ALLOWED_HOSTS.split(',').map((h) => h.trim()).filter(Boolean)
+  ? process.env.PUENTE_ALLOWED_HOSTS.split(',')
+      .map((h) => h.trim())
+      .filter(Boolean)
   : true;
 
 // https://vite.dev/config/

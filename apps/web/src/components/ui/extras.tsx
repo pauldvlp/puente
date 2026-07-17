@@ -58,7 +58,11 @@ export function StatusBadge({ meta, dot }: { meta: StatusMeta; dot?: boolean }) 
     <Badge variant={TONE_BADGE[meta.tone]} className="gap-1.5">
       {dot && (
         <span
-          className={cn('size-1.5 shrink-0 rounded-full', TONE_DOT[meta.tone], meta.tone === 'brand' && 'animate-pulse')}
+          className={cn(
+            'size-1.5 shrink-0 rounded-full',
+            TONE_DOT[meta.tone],
+            meta.tone === 'brand' && 'animate-pulse',
+          )}
         />
       )}
       {meta.label}

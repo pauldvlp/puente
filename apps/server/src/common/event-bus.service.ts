@@ -19,7 +19,12 @@ export class EventBus {
   }
 
   /** Convenience for reporting steps of a long-running job (e.g. provisioning). */
-  progress(scope: string, step: string, message: string, opts?: { done?: boolean; error?: boolean }): void {
+  progress(
+    scope: string,
+    step: string,
+    message: string,
+    opts?: { done?: boolean; error?: boolean },
+  ): void {
     this.emit({
       type: 'progress',
       scope,

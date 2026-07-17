@@ -72,7 +72,9 @@ export class CloudflaredService {
   }
 
   private async resolveCmd(target: Target): Promise<string> {
-    const r = await target.exec.exec('command -v cloudflared 2>/dev/null || echo "$HOME/.local/bin/cloudflared"');
+    const r = await target.exec.exec(
+      'command -v cloudflared 2>/dev/null || echo "$HOME/.local/bin/cloudflared"',
+    );
     return r.stdout.trim() || 'cloudflared';
   }
 
@@ -130,11 +132,15 @@ export class CloudflaredService {
     if (target.os === 'darwin') {
       const label = 'com.cloudflare.cloudflared';
       const map = { start: 'start', stop: 'stop', restart: 'kickstart -k' } as const;
-      await target.exec.exec(this.sudo(target, `launchctl ${map[action]} system/${label} 2>/dev/null || true`));
+      await target.exec.exec(
+        this.sudo(target, `launchctl ${map[action]} system/${label} 2>/dev/null || true`),
+      );
       return;
     }
     // linux (systemd) with a detached-process fallback
-    const hasSystemd = await target.exec.exec('command -v systemctl >/dev/null 2>&1 && echo yes || echo no');
+    const hasSystemd = await target.exec.exec(
+      'command -v systemctl >/dev/null 2>&1 && echo yes || echo no',
+    );
     if (hasSystemd.stdout.includes('yes')) {
       const res = await target.exec.exec(this.sudo(target, `systemctl ${action} cloudflared`));
       if (res.code === 0) return;
