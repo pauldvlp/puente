@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  type ReactNode,
-} from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import type { LoginInput, RegisterAdminInput, SessionUser } from '@puente/shared';
 import { api, getToken, setToken, clearToken } from './api';
 
@@ -22,14 +15,12 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Start "loading" only when there's a token to validate — otherwise there's nothing to wait
+  // for, and initializing from the token avoids a synchronous setState in the effect.
+  const [loading, setLoading] = useState(() => Boolean(getToken()));
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    if (!getToken()) return;
     api.auth
       .me()
       .then(setUser)

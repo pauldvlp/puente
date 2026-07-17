@@ -19,7 +19,9 @@ function banner(url: string): void {
   const line = '─'.repeat(46);
   console.log('');
   console.log(cyan(`  ┌${line}┐`));
-  console.log(cyan('  │') + bold('  ☁  puente — Cloudflare Tunnel manager') + '       ' + cyan('│'));
+  console.log(
+    cyan('  │') + bold('  ☁  puente — Cloudflare Tunnel manager') + '       ' + cyan('│'),
+  );
   console.log(cyan(`  ├${line}┤`));
   console.log(cyan('  │') + `  Dashboard:  ${green(url)}`.padEnd(56) + cyan('│'));
   console.log(cyan('  │') + dim(`  Data dir:   ${DATA_DIR}`).padEnd(64) + cyan('│'));
@@ -30,10 +32,13 @@ function banner(url: string): void {
 }
 
 function openBrowser(url: string): void {
-  const cmd =
-    platform() === 'darwin' ? 'open' : platform() === 'win32' ? 'start' : 'xdg-open';
+  const cmd = platform() === 'darwin' ? 'open' : platform() === 'win32' ? 'start' : 'xdg-open';
   try {
-    const child = spawn(cmd, [url], { stdio: 'ignore', detached: true, shell: platform() === 'win32' });
+    const child = spawn(cmd, [url], {
+      stdio: 'ignore',
+      detached: true,
+      shell: platform() === 'win32',
+    });
     child.on('error', () => undefined);
     child.unref();
   } catch {
@@ -94,11 +99,15 @@ program
   .description('Check the local environment')
   .action(async () => {
     const checks: Array<[string, boolean, string]> = [];
-    const nodeOk = Number(process.versions.node.split('.')[0]) >= 20;
-    checks.push(['Node.js >= 20', nodeOk, process.version]);
+    const nodeOk = Number(process.versions.node.split('.')[0]) >= 22;
+    checks.push(['Node.js >= 22', nodeOk, process.version]);
     checks.push(['Data directory', existsSync(DATA_DIR), DATA_DIR]);
     const cf = await hasBinary('cloudflared');
-    checks.push(['cloudflared (local)', cf, cf ? 'found on PATH' : 'not found — puente will download it when needed']);
+    checks.push([
+      'cloudflared (local)',
+      cf,
+      cf ? 'found on PATH' : 'not found — puente will download it when needed',
+    ]);
     const ssh = await hasBinary('ssh');
     checks.push(['ssh client', ssh, ssh ? 'found' : 'not found']);
     console.log(`\n${bold('puente doctor')}\n`);

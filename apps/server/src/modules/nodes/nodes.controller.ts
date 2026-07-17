@@ -43,10 +43,7 @@ export class NodesController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body(new ZodBody(UpdateNodeSchema)) dto: UpdateNodeInput,
-  ): Node {
+  update(@Param('id') id: string, @Body(new ZodBody(UpdateNodeSchema)) dto: UpdateNodeInput): Node {
     return this.nodes.update(id, dto);
   }
 
@@ -78,10 +75,7 @@ export class NodesController {
   }
 
   @Post(':id/connector/:action')
-  connector(
-    @Param('id') id: string,
-    @Param('action') action: string,
-  ): Promise<Node> {
+  connector(@Param('id') id: string, @Param('action') action: string): Promise<Node> {
     if (action !== 'start' && action !== 'stop' && action !== 'restart') {
       throw new BadRequestException('action must be start, stop or restart');
     }

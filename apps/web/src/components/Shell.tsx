@@ -87,7 +87,9 @@ export function Shell() {
                       <Icon
                         className={cn(
                           'size-[18px] shrink-0 transition-colors',
-                          isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground',
+                          isActive
+                            ? 'text-primary'
+                            : 'text-muted-foreground group-hover:text-foreground',
                         )}
                       />
                       <span>{item.label}</span>
@@ -95,7 +97,9 @@ export function Shell() {
                         <span
                           className={cn(
                             'ml-auto rounded-full px-1.5 py-0.5 text-[11px] font-semibold tabular-nums',
-                            isActive ? 'bg-primary/12 text-primary' : 'bg-muted text-muted-foreground',
+                            isActive
+                              ? 'bg-primary/12 text-primary'
+                              : 'bg-muted text-muted-foreground',
                           )}
                         >
                           {count}
@@ -114,7 +118,9 @@ export function Shell() {
             ) : (
               <WifiOff className="size-4 text-muted-foreground" />
             )}
-            <span className={cn('font-medium', connected ? 'text-foreground' : 'text-muted-foreground')}>
+            <span
+              className={cn('font-medium', connected ? 'text-foreground' : 'text-muted-foreground')}
+            >
               {connected ? 'Live' : 'Offline'}
             </span>
             <span

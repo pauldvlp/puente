@@ -48,13 +48,17 @@ export function LiveProvider({ children }: { children: ReactNode }) {
           upsertNode(qc, event.node);
           break;
         case 'node.deleted':
-          qc.setQueryData<PuenteNode[]>(qk.nodes, (old) => old?.filter((n) => n.id !== event.nodeId));
+          qc.setQueryData<PuenteNode[]>(qk.nodes, (old) =>
+            old?.filter((n) => n.id !== event.nodeId),
+          );
           break;
         case 'route.updated':
           upsertRoute(qc, event.route);
           break;
         case 'route.deleted':
-          qc.setQueryData<PuenteRoute[]>(qk.routes, (old) => old?.filter((r) => r.id !== event.routeId));
+          qc.setQueryData<PuenteRoute[]>(qk.routes, (old) =>
+            old?.filter((r) => r.id !== event.routeId),
+          );
           break;
         case 'event':
           qc.invalidateQueries({ queryKey: qk.events });

@@ -19,9 +19,7 @@ export class AuthController {
   /** First-run only: create the single administrator account. */
   @Public()
   @Post('register')
-  register(
-    @Body(new ZodBody(RegisterAdminSchema)) dto: RegisterAdminInput,
-  ): Promise<AuthToken> {
+  register(@Body(new ZodBody(RegisterAdminSchema)) dto: RegisterAdminInput): Promise<AuthToken> {
     return this.auth.register(dto);
   }
 

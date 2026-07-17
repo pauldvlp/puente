@@ -1,0 +1,6 @@
+# Build outputs and lockfile — not ours to format.
+**/dist
+**/node_modules
+pnpm-lock.yaml
+apps/web/dist
+CHANGELOG.md

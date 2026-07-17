@@ -8,20 +8,8 @@ import { useNodeMutations } from '../lib/hooks';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Field } from './ui/extras';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from './ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { cn } from '@/lib/utils';
 
 export function AddNodeDialog({
@@ -109,7 +97,11 @@ export function AddNodeDialog({
             />
           </div>
 
-          <Field label="Name" hint="A friendly label, e.g. “matebook” or “home-server”." htmlFor="node-name">
+          <Field
+            label="Name"
+            hint="A friendly label, e.g. “matebook” or “home-server”."
+            htmlFor="node-name"
+          >
             <Input
               id="node-name"
               value={name}
@@ -121,7 +113,10 @@ export function AddNodeDialog({
           {kind === 'ssh' && (
             <>
               {sshHosts.data && sshHosts.data.length > 0 && (
-                <Field label="Use an ~/.ssh/config host" hint="Optional — prefills the fields below.">
+                <Field
+                  label="Use an ~/.ssh/config host"
+                  hint="Optional — prefills the fields below."
+                >
                   <Select onValueChange={(v) => applyAlias(v)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a host alias…" />
@@ -139,10 +134,20 @@ export function AddNodeDialog({
               )}
               <div className="grid gap-3" style={{ gridTemplateColumns: '1fr 90px' }}>
                 <Field label="Host / IP" htmlFor="ssh-host">
-                  <Input id="ssh-host" value={host} onChange={(e) => setHost(e.target.value)} placeholder="10.3.165.82" />
+                  <Input
+                    id="ssh-host"
+                    value={host}
+                    onChange={(e) => setHost(e.target.value)}
+                    placeholder="10.3.165.82"
+                  />
                 </Field>
                 <Field label="Port" htmlFor="ssh-port">
-                  <Input id="ssh-port" value={port} onChange={(e) => setPort(e.target.value)} placeholder="22" />
+                  <Input
+                    id="ssh-port"
+                    value={port}
+                    onChange={(e) => setPort(e.target.value)}
+                    placeholder="22"
+                  />
                 </Field>
               </div>
               <Field label="SSH username" htmlFor="ssh-user">
@@ -204,9 +209,7 @@ function KindCard({
       disabled={disabled}
       className={cn(
         'flex flex-col gap-1.5 rounded-xl border bg-elevated p-4 text-left transition-all',
-        active
-          ? 'border-primary ring-2 ring-primary/30'
-          : 'hover:border-border hover:bg-accent/40',
+        active ? 'border-primary ring-2 ring-primary/30' : 'hover:border-border hover:bg-accent/40',
         disabled && 'cursor-not-allowed opacity-50',
       )}
     >

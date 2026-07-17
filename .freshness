@@ -1,0 +1,7 @@
+# Freshness checkpoint — @pauldvlp/conventions references/freshness.md
+last_reviewed: 2026-07-17
+# open items (updated as they land):
+# - [done] dropped EOL Node 20: smoke matrix [22,24], engines floor >=22, cli doctor + docs
+# - [done] added lint + format (ESLint flat + Prettier), wired to CI
+# - tests: zero tests today; E2E design blocked on Cloudflare (real zone vs mock)
+# - TS pinned ^5.7 for NestJS decorator metadata; TS 7 is GA now — re-verify before touching

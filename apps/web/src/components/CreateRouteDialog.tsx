@@ -13,20 +13,8 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Switch } from './ui/switch';
 import { Field } from './ui/extras';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from './ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { cn } from '@/lib/utils';
 
 const PROTOCOLS: ServiceProtocol[] = ['http', 'https', 'tcp', 'ssh', 'rdp'];
@@ -189,7 +177,12 @@ export function CreateRouteDialog({
               </Select>
             </Field>
             <Field label="Service host" htmlFor="svc-host">
-              <Input id="svc-host" value={host} onChange={(e) => setHost(e.target.value)} placeholder="localhost" />
+              <Input
+                id="svc-host"
+                value={host}
+                onChange={(e) => setHost(e.target.value)}
+                placeholder="localhost"
+              />
             </Field>
             <Field label="Port" htmlFor="svc-port">
               <Input
@@ -203,16 +196,32 @@ export function CreateRouteDialog({
           </div>
 
           <div>
-            <Button variant="ghost" size="sm" className="-ml-2" onClick={() => setAdvanced((a) => !a)}>
-              <ChevronDown className={cn('size-3.5 transition-transform', advanced && 'rotate-180')} />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="-ml-2"
+              onClick={() => setAdvanced((a) => !a)}
+            >
+              <ChevronDown
+                className={cn('size-3.5 transition-transform', advanced && 'rotate-180')}
+              />
               Advanced options
             </Button>
           </div>
 
           {advanced && (
             <div className="flex flex-col gap-3 rounded-xl bg-muted/60 p-4">
-              <Field label="Path (regex)" hint="Optional. Route only requests matching this path." htmlFor="path">
-                <Input id="path" value={path} onChange={(e) => setPath(e.target.value)} placeholder="/api/.*" />
+              <Field
+                label="Path (regex)"
+                hint="Optional. Route only requests matching this path."
+                htmlFor="path"
+              >
+                <Input
+                  id="path"
+                  value={path}
+                  onChange={(e) => setPath(e.target.value)}
+                  placeholder="/api/.*"
+                />
               </Field>
               <Field
                 label="HTTP Host header"
@@ -229,7 +238,9 @@ export function CreateRouteDialog({
               <div className="flex items-center justify-between gap-4">
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">Skip origin TLS verification</span>
-                  <span className="text-xs text-muted-foreground">Enable for self-signed HTTPS origins.</span>
+                  <span className="text-xs text-muted-foreground">
+                    Enable for self-signed HTTPS origins.
+                  </span>
                 </div>
                 <Switch checked={noTLSVerify} onCheckedChange={setNoTLSVerify} />
               </div>

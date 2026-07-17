@@ -9,21 +9,25 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { Field } from './ui/extras';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const TOKEN_URL = 'https://dash.cloudflare.com/profile/api-tokens';
 
 const FALLBACK_SCOPES: ScopeItem[] = [
-  { category: 'Account', group: 'Cloudflare Tunnel', access: 'Edit', reason: 'Create & configure tunnels' },
+  {
+    category: 'Account',
+    group: 'Cloudflare Tunnel',
+    access: 'Edit',
+    reason: 'Create & configure tunnels',
+  },
   { category: 'Zone', group: 'DNS', access: 'Edit', reason: 'Create routing DNS records' },
   { category: 'Zone', group: 'Zone', access: 'Read', reason: 'List your domains' },
-  { category: 'Account', group: 'Account Settings', access: 'Read', reason: 'Discover your account id' },
+  {
+    category: 'Account',
+    group: 'Account Settings',
+    access: 'Read',
+    reason: 'Discover your account id',
+  },
 ];
 
 export function ScopeGuide({ scopes }: { scopes: ScopeItem[] }) {
@@ -49,11 +53,13 @@ export function ScopeGuide({ scopes }: { scopes: ScopeItem[] }) {
             and click <b className="text-foreground">Create Token → Create Custom Token</b>.
           </li>
           <li>
-            Under <b className="text-foreground">Permissions</b>, add each row below (Category · Group · Access).
+            Under <b className="text-foreground">Permissions</b>, add each row below (Category ·
+            Group · Access).
           </li>
           <li>
             Set <b className="text-foreground">Account Resources</b> = your account,{' '}
-            <b className="text-foreground">Zone Resources</b> = All zones, then create and copy the token.
+            <b className="text-foreground">Zone Resources</b> = All zones, then create and copy the
+            token.
           </li>
         </ol>
         <div className="mt-1 flex flex-col gap-1.5">
@@ -120,7 +126,11 @@ export function ConnectCloudflare({ onConnected }: { onConnected?: () => void })
 
       <Card className="gap-0 py-0">
         <div className="flex flex-col gap-3 p-5">
-          <Field label="API Token" hint="Pasted once and stored encrypted (AES-256-GCM) on this machine." htmlFor="cf-token">
+          <Field
+            label="API Token"
+            hint="Pasted once and stored encrypted (AES-256-GCM) on this machine."
+            htmlFor="cf-token"
+          >
             <div className="flex gap-2">
               <div className="relative grow">
                 <KeyRound className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -153,7 +163,8 @@ export function ConnectCloudflare({ onConnected }: { onConnected?: () => void })
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="size-4 text-success" />
                 <span className="font-semibold">
-                  Token valid · {verified.zones.length} domain{verified.zones.length === 1 ? '' : 's'} found
+                  Token valid · {verified.zones.length} domain
+                  {verified.zones.length === 1 ? '' : 's'} found
                 </span>
               </div>
 
@@ -189,7 +200,8 @@ export function ConnectCloudflare({ onConnected }: { onConnected?: () => void })
 }
 
 function ZoneChips({ zones }: { zones: CloudflareZone[] }) {
-  if (zones.length === 0) return <span className="text-sm text-muted-foreground">No zones visible for this token.</span>;
+  if (zones.length === 0)
+    return <span className="text-sm text-muted-foreground">No zones visible for this token.</span>;
   return (
     <div className="flex flex-wrap gap-1.5">
       {zones.slice(0, 10).map((z) => (

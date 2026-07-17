@@ -7,7 +7,7 @@ Expose local ports — on this PC or on remote servers reached over SSH — on y
   <a href="https://www.npmjs.com/package/puente"><img alt="npm" src="https://img.shields.io/npm/v/puente?color=%230b7285&label=puente"></a>
   <a href="https://github.com/pauldvlp/puente/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/pauldvlp/puente/actions/workflows/ci.yml/badge.svg"></a>
   <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-  <img alt="Node >= 20" src="https://img.shields.io/badge/node-%3E%3D20-brightgreen">
+  <img alt="Node >= 22" src="https://img.shields.io/badge/node-%3E%3D22-brightgreen">
 </p>
 
 ```bash
@@ -60,14 +60,14 @@ including the exact Cloudflare API token scopes.
 
 ## Stack
 
-| Layer | Tech |
-|-------|------|
-| Frontend | React 19 · Vite · TanStack Query · react-router · custom design system (light/dark) |
-| Backend | NestJS 11 (Express 5) · SSE · JWT auth |
-| Persistence | SQLite via Drizzle ORM + better-sqlite3 |
-| Cloudflare | Official `cloudflare` SDK (remotely-managed tunnels) |
-| SSH | `node-ssh` / `ssh2` |
-| Packaging | pnpm workspace → single installable npm package with a `puente` CLI |
+| Layer       | Tech                                                                                |
+| ----------- | ----------------------------------------------------------------------------------- |
+| Frontend    | React 19 · Vite · TanStack Query · react-router · custom design system (light/dark) |
+| Backend     | NestJS 11 (Express 5) · SSE · JWT auth                                              |
+| Persistence | SQLite via Drizzle ORM + better-sqlite3                                             |
+| Cloudflare  | Official `cloudflare` SDK (remotely-managed tunnels)                                |
+| SSH         | `node-ssh` / `ssh2`                                                                 |
+| Packaging   | pnpm workspace → single installable npm package with a `puente` CLI                 |
 
 ## Repository layout
 
@@ -82,7 +82,7 @@ packages/
 
 ## Development
 
-Requires Node ≥ 22.13 (pnpm 11 needs it) and pnpm ≥ 11 for development — the published tool runs on Node ≥ 20. See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for the full guide.
+Requires Node ≥ 22.13 (pnpm 11 needs it) and pnpm ≥ 11 for development — the published tool runs on Node ≥ 22. See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for the full guide.
 
 ```bash
 pnpm install

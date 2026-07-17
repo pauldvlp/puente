@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react';
 import { ExternalLink, HeartPulse, Plus, Trash2, Waypoints } from 'lucide-react';
 import { buildServiceUrl, type Route as PuenteRoute } from '@puente/shared';
-import { useNodes, useRoutes, useRouteMutations, useZones, useCloudflareConnection } from '../lib/hooks';
+import {
+  useNodes,
+  useRoutes,
+  useRouteMutations,
+  useZones,
+  useCloudflareConnection,
+} from '../lib/hooks';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -33,7 +39,9 @@ export function RoutesPage() {
       <header className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Routes</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Public subdomains mapped to local services on your nodes.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Public subdomains mapped to local services on your nodes.
+          </p>
         </div>
         <Button onClick={() => setOpen(true)} disabled={!canPublish}>
           <Plus className="size-4" />
@@ -93,12 +101,25 @@ export function RoutesPage() {
   );
 }
 
-function RouteRow({ route, nodeName, last }: { route: PuenteRoute; nodeName: string; last: boolean }) {
+function RouteRow({
+  route,
+  nodeName,
+  last,
+}: {
+  route: PuenteRoute;
+  nodeName: string;
+  last: boolean;
+}) {
   const { remove, check } = useRouteMutations();
   const url = `https://${route.hostname}`;
 
   return (
-    <div className={cn('flex items-center gap-3.5 px-5 py-3.5 transition-colors hover:bg-muted/40', !last && 'border-b')}>
+    <div
+      className={cn(
+        'flex items-center gap-3.5 px-5 py-3.5 transition-colors hover:bg-muted/40',
+        !last && 'border-b',
+      )}
+    >
       <div className="flex min-w-0 grow flex-col">
         <a
           href={url}
@@ -129,7 +150,9 @@ function RouteRow({ route, nodeName, last }: { route: PuenteRoute; nodeName: str
           onClick={() => check.mutate(route.id)}
           title="Check health"
         >
-          {!(check.isPending && check.variables === route.id) && <HeartPulse className="size-3.5" />}
+          {!(check.isPending && check.variables === route.id) && (
+            <HeartPulse className="size-3.5" />
+          )}
         </Button>
         <Button
           size="icon-sm"

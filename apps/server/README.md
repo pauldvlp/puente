@@ -16,7 +16,7 @@ Everything is driven from one beautiful web UI. puente talks to the Cloudflare A
 
 ## Install & run
 
-You need **Node.js ≥ 20**. Pick your package manager:
+You need **Node.js ≥ 22**. Pick your package manager:
 
 ```bash
 # Run once, without installing
@@ -70,12 +70,12 @@ with the `PUENTE_PORT` environment variable.
 
 Create the token at **[dash.cloudflare.com → My Profile → API Tokens](https://dash.cloudflare.com/profile/api-tokens)** → **Create Token → Create Custom Token**, and add exactly these four permissions:
 
-| Category | Permission group | Access | Why |
-|----------|------------------|--------|-----|
-| **Account** | Cloudflare Tunnel | **Edit** | Create & configure tunnels and their ingress rules |
-| **Zone** | DNS | **Edit** | Create the proxied CNAME records that route subdomains |
-| **Zone** | Zone | **Read** | List your domains so you can pick where to publish |
-| **Account** | Account Settings | **Read** | Auto-discover your account id |
+| Category    | Permission group  | Access   | Why                                                    |
+| ----------- | ----------------- | -------- | ------------------------------------------------------ |
+| **Account** | Cloudflare Tunnel | **Edit** | Create & configure tunnels and their ingress rules     |
+| **Zone**    | DNS               | **Edit** | Create the proxied CNAME records that route subdomains |
+| **Zone**    | Zone              | **Read** | List your domains so you can pick where to publish     |
+| **Account** | Account Settings  | **Read** | Auto-discover your account id                          |
 
 Then set **Account Resources** = your account and **Zone Resources** = _All zones_ (or the specific domains you want to manage), create the token, and copy it once. The panel shows this same checklist while you set up.
 
@@ -156,7 +156,7 @@ Tunnels are **remotely-managed** (`config_src: cloudflare`): configuration lives
 
 ## Requirements
 
-- Node.js ≥ 20 on the machine running puente.
+- Node.js ≥ 22 on the machine running puente.
 - A Cloudflare account with at least one domain (zone).
 - For remote nodes: SSH access. `cloudflared` is installed automatically if missing.
 - `better-sqlite3` ships prebuilt binaries; on unusual platforms a C/C++ toolchain + Python may be needed to build it.

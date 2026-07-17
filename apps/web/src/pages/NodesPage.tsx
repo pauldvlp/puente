@@ -32,7 +32,9 @@ export function NodesPage() {
       <header className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Nodes</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Machines running a Cloudflare Tunnel connector.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Machines running a Cloudflare Tunnel connector.
+          </p>
         </div>
         <Button onClick={() => setAddOpen(true)}>
           <Plus className="size-4" />

@@ -77,7 +77,8 @@ export function useNodeMutations() {
   });
 
   const provision = useMutation({
-    mutationFn: (v: { id: string; input: ProvisionNodeInput }) => api.nodes.provision(v.id, v.input),
+    mutationFn: (v: { id: string; input: ProvisionNodeInput }) =>
+      api.nodes.provision(v.id, v.input),
     onSuccess: () => {
       invalidate();
       qc.invalidateQueries({ queryKey: qk.setup });

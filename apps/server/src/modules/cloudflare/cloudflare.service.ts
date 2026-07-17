@@ -1,4 +1,9 @@
-import { Injectable, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import Cloudflare from 'cloudflare';
 import type {
   CloudflareAccount,
@@ -53,8 +58,13 @@ export class CloudflareService {
   }
 
   private wrap(err: unknown, context: string): never {
-    const anyErr = err as { status?: number; message?: string; errors?: Array<{ message: string }> };
-    const detail = anyErr?.errors?.map((e) => e.message).join('; ') || anyErr?.message || String(err);
+    const anyErr = err as {
+      status?: number;
+      message?: string;
+      errors?: Array<{ message: string }>;
+    };
+    const detail =
+      anyErr?.errors?.map((e) => e.message).join('; ') || anyErr?.message || String(err);
     this.logger.warn(`Cloudflare error (${context}): ${detail}`);
     if (anyErr?.status === 403 || anyErr?.status === 401) {
       throw new BadRequestException({
@@ -132,8 +142,7 @@ export class CloudflareService {
         code: 'CF_NO_ACCOUNTS',
       });
     }
-    const account =
-      accounts.find((a) => a.id === preferredAccountId) ?? accounts[0];
+    const account = accounts.find((a) => a.id === preferredAccountId) ?? accounts[0];
     const accountZones = zones.filter((z) => !z.accountId || z.accountId === account.id);
     this.settings.setCloudflareToken(token, account.id, account.name);
     this.settings.saveZones(accountZones.length ? accountZones : zones);
@@ -175,7 +184,12 @@ export class CloudflareService {
       for await (const z of cf.zones.list()) {
         const zAccount = (z as { account?: { id?: string } }).account?.id;
         if (accountId && zAccount && zAccount !== accountId) continue;
-        zones.push({ id: z.id, name: z.name, status: (z as { status?: string }).status, accountId: zAccount });
+        zones.push({
+          id: z.id,
+          name: z.name,
+          status: (z as { status?: string }).status,
+          accountId: zAccount,
+        });
       }
     } catch (err) {
       this.wrap(err, 'refresh zones');

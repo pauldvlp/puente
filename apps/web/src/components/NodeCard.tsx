@@ -101,7 +101,9 @@ export function NodeCard({
           <span>
             {routeCount} route{routeCount === 1 ? '' : 's'}
           </span>
-          {node.lastSeenAt && <span className="text-muted-foreground/70">seen {relativeTime(node.lastSeenAt)}</span>}
+          {node.lastSeenAt && (
+            <span className="text-muted-foreground/70">seen {relativeTime(node.lastSeenAt)}</span>
+          )}
         </div>
 
         {/* Provisioned status row */}
@@ -225,15 +227,20 @@ export function NodeCard({
         </div>
       </div>
 
-      <BootstrapDialog nodeId={node.id} nodeName={node.name} open={bootstrapOpen} onClose={() => setBootstrapOpen(false)} />
+      <BootstrapDialog
+        nodeId={node.id}
+        nodeName={node.name}
+        open={bootstrapOpen}
+        onClose={() => setBootstrapOpen(false)}
+      />
 
       <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Remove node?</DialogTitle>
             <DialogDescription>
-              This deletes the Cloudflare tunnel for <b className="text-foreground">{node.name}</b>, removes its routes
-              and DNS records, and stops the connector. This cannot be undone.
+              This deletes the Cloudflare tunnel for <b className="text-foreground">{node.name}</b>,
+              removes its routes and DNS records, and stops the connector. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -285,8 +292,9 @@ function BootstrapDialog({
         <DialogHeader>
           <DialogTitle>Set up passwordless SSH</DialogTitle>
           <DialogDescription>
-            puente will generate a dedicated ed25519 key and install it on <b className="text-foreground">{nodeName}</b>.
-            Your password is used once and never stored.
+            puente will generate a dedicated ed25519 key and install it on{' '}
+            <b className="text-foreground">{nodeName}</b>. Your password is used once and never
+            stored.
           </DialogDescription>
         </DialogHeader>
         <Field label="SSH password (one time)" htmlFor="ssh-password">

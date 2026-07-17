@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 import {
   buildServiceUrl,
@@ -40,7 +35,11 @@ export class RoutesService {
   }
 
   list(): Route[] {
-    return this.db.select().from(routes).all().map((r) => this.toDto(r));
+    return this.db
+      .select()
+      .from(routes)
+      .all()
+      .map((r) => this.toDto(r));
   }
 
   listForNode(nodeId: string): Route[] {
@@ -127,11 +126,19 @@ export class RoutesService {
         hostname,
         node.tunnelId,
       );
-      this.patch(row.id, { dnsRecordId: recordId, status: dto.enabled ? 'active' : 'disabled', lastError: null });
-      this.events.success('route.create', `Published ${hostname} → ${buildServiceUrl(dto.service)}`, {
-        nodeId: dto.nodeId,
-        routeId: row.id,
+      this.patch(row.id, {
+        dnsRecordId: recordId,
+        status: dto.enabled ? 'active' : 'disabled',
+        lastError: null,
       });
+      this.events.success(
+        'route.create',
+        `Published ${hostname} → ${buildServiceUrl(dto.service)}`,
+        {
+          nodeId: dto.nodeId,
+          routeId: row.id,
+        },
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.patch(row.id, { status: 'error', lastError: msg });
@@ -166,9 +173,9 @@ export class RoutesService {
   async remove(id: string): Promise<void> {
     const row = this.getRow(id);
     if (row.dnsRecordId) {
-      await this.cloudflare.deleteDnsRecord(row.zoneId, row.dnsRecordId).catch((e) =>
-        this.logger.warn(`DNS delete failed for ${row.hostname}: ${String(e)}`),
-      );
+      await this.cloudflare
+        .deleteDnsRecord(row.zoneId, row.dnsRecordId)
+        .catch((e) => this.logger.warn(`DNS delete failed for ${row.hostname}: ${String(e)}`));
     }
     this.db.delete(routes).where(eq(routes.id, id)).run();
     const node = this.db.select().from(nodes).where(eq(nodes.id, row.nodeId)).get();
@@ -177,7 +184,10 @@ export class RoutesService {
         this.logger.warn(`Ingress rebuild after delete failed: ${String(e)}`),
       );
     }
-    this.events.info('route.delete', `Removed route ${row.hostname}`, { nodeId: row.nodeId, routeId: id });
+    this.events.info('route.delete', `Removed route ${row.hostname}`, {
+      nodeId: row.nodeId,
+      routeId: id,
+    });
     this.bus.emit({ type: 'route.deleted', routeId: id });
   }
 
@@ -229,9 +239,9 @@ export class RoutesService {
     const row = this.getRow(id);
     // The public hostname is always fronted by Cloudflare over HTTPS,
     // regardless of the origin protocol.
-    let health: RouteHealth = 'unknown';
+    let health: RouteHealth;
     let httpStatus: number | null = null;
-    let message = '';
+    let message: string;
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 10000);
@@ -250,13 +260,21 @@ export class RoutesService {
       message = err instanceof Error ? err.message : String(err);
     }
     const checkedAt = nowMs();
-    this.patch(id, { health, lastCheckedAt: checkedAt, lastError: health === 'healthy' ? null : message });
+    this.patch(id, {
+      health,
+      lastCheckedAt: checkedAt,
+      lastError: health === 'healthy' ? null : message,
+    });
     this.emitUpdated(id);
     return { health, httpStatus, message, checkedAt: toIsoStrict(checkedAt) };
   }
 
   private patch(id: string, patch: Partial<RouteRow>): void {
-    this.db.update(routes).set({ ...patch, updatedAt: nowMs() }).where(eq(routes.id, id)).run();
+    this.db
+      .update(routes)
+      .set({ ...patch, updatedAt: nowMs() })
+      .where(eq(routes.id, id))
+      .run();
   }
 
   private emitUpdated(id: string): Route {
