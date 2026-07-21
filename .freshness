@@ -2,10 +2,12 @@
 last_reviewed: 2026-07-21
 # open items (updated as they land):
 # - [done] dropped EOL Node 20; added lint + format (ESLint flat + Prettier)
-# - [done 2026-07-19] Vitest + unit suite (was ZERO tests): shared route/hostname logic, crypto service
-# - [done 2026-07-21] integration: RoutesService.rebuildIngress vs a real throwaway SQLite with
-#     Cloudflare doubled, and the putIngress catch-all contract with the SDK doubled. 23 tests.
-# - next: Playwright on the SPA (backend with Cloudflare doubled)
-# - next: the workflow_dispatch real-Cloudflare job — needs a DEDICATED test zone + a repo secret
-#     (token scope: Zone:DNS:Edit + Account:Cloudflare Tunnel:Edit, scoped to that zone). Paul provisions.
+# - [done 2026-07-19] Vitest unit suite (was ZERO tests): shared route/hostname logic, crypto service
+# - [done 2026-07-21] integration: rebuildIngress vs real SQLite + the putIngress catch-all contract
+# - [done 2026-07-21] Playwright E2E on the SPA: first-run register -> JWT -> panel, navigation,
+#     sign-out/sign-in, and the auth guard. Built server + built SPA, fresh data dir, no Cloudflare.
+# - ONLY REMAINING: the workflow_dispatch real-Cloudflare run. Needs Paul to provision:
+#     a DEDICATED test zone + a repo secret with a token scoped to it
+#     (Zone:DNS:Edit + Account:Cloudflare Tunnel:Edit).
+# - minor gap: root-level configs (vitest/playwright) and e2e/ aren't covered by any package's tsc
 # - TS pinned ^5.7 for NestJS decorator metadata; TS 7 is GA now — re-verify before touching
