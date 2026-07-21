@@ -88,6 +88,14 @@ jobs:
       - name: Test
         run: pnpm test
 
+      # E2E: the built server serving the built SPA, against a fresh data dir. Chromium
+      # only; no Cloudflare involved, so no secrets.
+      - name: Install chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E
+        run: pnpm test:e2e
+
       - name: Pack the published package
         working-directory: apps/server
         run: npm pack --pack-destination "$RUNNER_TEMP"

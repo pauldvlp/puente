@@ -50,3 +50,8 @@ coverage/
 
 # vitest throwaway data dir (PUENTE_DATA_DIR during tests)
 /.vitest-data
+
+# playwright e2e (throwaway data dir + artifacts)
+/.e2e-data
+/test-results
+/playwright-report
