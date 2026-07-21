@@ -85,6 +85,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Test
+        run: pnpm test
+
       - name: Pack the published package
         working-directory: apps/server
         run: npm pack --pack-destination "$RUNNER_TEMP"
