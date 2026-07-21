@@ -13,6 +13,8 @@ export default defineConfig({
     // never reach the published package.
     include: ['apps/*/src/**/*.spec.ts', 'packages/*/src/**/*.spec.ts'],
     globalSetup: ['./test/global-setup.ts'],
+    // Integration specs share one SQLite file under the isolated data dir.
+    fileParallelism: false,
     env: { PUENTE_DATA_DIR },
   },
 });
