@@ -1,13 +1,12 @@
 # Freshness checkpoint — @pauldvlp/conventions references/freshness.md
 last_reviewed: 2026-07-21
 # open items (updated as they land):
-# - [done] dropped EOL Node 20; added lint + format (ESLint flat + Prettier)
-# - [done 2026-07-19] Vitest unit suite (was ZERO tests): shared route/hostname logic, crypto service
-# - [done 2026-07-21] integration: rebuildIngress vs real SQLite + the putIngress catch-all contract
-# - [done 2026-07-21] Playwright E2E on the SPA: first-run register -> JWT -> panel, navigation,
-#     sign-out/sign-in, and the auth guard. Built server + built SPA, fresh data dir, no Cloudflare.
-# - ONLY REMAINING: the workflow_dispatch real-Cloudflare run. Needs Paul to provision:
-#     a DEDICATED test zone + a repo secret with a token scoped to it
-#     (Zone:DNS:Edit + Account:Cloudflare Tunnel:Edit).
+# - [done] dropped EOL Node 20; lint + format (ESLint flat + Prettier)
+# - [done] Vitest unit (shared route/hostname, crypto) + integration (rebuildIngress, putIngress catch-all)
+# - [done] Playwright E2E on the SPA: first-run register -> JWT -> panel, nav, sign-out, auth guard
+# - [done 2026-07-21] live Cloudflare check: opt-in workflow_dispatch against the real API
+#     (tunnel + proxied CNAME named e2e-<run id>, deleted afterwards). Secret: CF_TEST_API_TOKEN,
+#     token scoped to the gdy.me zone only. Skipped everywhere the secret isn't present.
+# - next (optional): a `--full` variant that also runs cloudflared and verifies through the edge
 # - minor gap: root-level configs (vitest/playwright) and e2e/ aren't covered by any package's tsc
 # - TS pinned ^5.7 for NestJS decorator metadata; TS 7 is GA now — re-verify before touching
