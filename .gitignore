@@ -47,3 +47,6 @@ coverage/
 
 # Codegraph
 .codegraph/
+
+# vitest throwaway data dir (PUENTE_DATA_DIR during tests)
+/.vitest-data

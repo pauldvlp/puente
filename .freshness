@@ -1,7 +1,11 @@
 # Freshness checkpoint — @pauldvlp/conventions references/freshness.md
-last_reviewed: 2026-07-17
+last_reviewed: 2026-07-19
 # open items (updated as they land):
 # - [done] dropped EOL Node 20: smoke matrix [22,24], engines floor >=22, cli doctor + docs
 # - [done] added lint + format (ESLint flat + Prettier), wired to CI
-# - tests: zero tests today; E2E design blocked on Cloudflare (real zone vs mock)
+# - [done 2026-07-19] Vitest + unit suite (was ZERO tests): shared route/hostname/ingress logic
+#     and the crypto service (AES-256-GCM round-trip, tamper rejection, scrypt verify).
+# - next: integration tests (services vs throwaway SQLite, cloudflare SDK + CommandExecutor doubled)
+# - next: Playwright on the SPA, and the workflow_dispatch real-Cloudflare job
+#     (needs a dedicated test zone + a repo secret — Paul provisions those)
 # - TS pinned ^5.7 for NestJS decorator metadata; TS 7 is GA now — re-verify before touching
