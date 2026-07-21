@@ -83,12 +83,16 @@ describe.skipIf(!TOKEN)('Cloudflare, live', () => {
     expect(again.recordId).toBe(recordId);
   });
 
-  it('cleans up: the DNS record and the tunnel are gone', async () => {
+  it('cleans up: the DNS record is deleted and the tunnel leaves the live list', async () => {
     await cf.deleteDnsRecord(zoneId, recordId);
     recordId = '';
+
     await cf.deleteTunnel(tunnelId);
-    const gone = await cf.getTunnelInfo(tunnelId);
+    // Cloudflare SOFT-deletes tunnels: fetching one by id still resolves, with deleted_at
+    // set — it does not 404. "Gone" therefore means gone from the list puente builds, which
+    // is exactly what listTunnels() filters on. (Learned from the first live run.)
+    const live = await cf.listTunnels();
+    expect(live.some((t) => t.id === tunnelId)).toBe(false);
     tunnelId = '';
-    expect(gone).toBeNull();
   });
 });
