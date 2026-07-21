@@ -1,0 +1,67 @@
+name: Cloudflare (live)
+
+# Opt-in only. Talks to the real Cloudflare API and creates real resources in the test
+# zone — a tunnel and a proxied CNAME named after the run id — then deletes them.
+# Run it before a release, or after touching anything under modules/cloudflare.
+#
+# The mocked integration specs in the normal CI run pin the logic; this pins what only
+# the real API can prove: SDK v6 call shapes, the ingress PUT payload, the DNS record
+# shape and cascade cleanup.
+
+on:
+  workflow_dispatch:
+    inputs:
+      zone:
+        description: 'Test zone. Records are created as e2e-<run id>.<zone> and deleted afterwards.'
+        default: gdy.me
+        required: true
+
+# Never let two live runs share the account at once.
+concurrency:
+  group: cloudflare-live
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    name: Live Cloudflare check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The server's imports resolve @puente/shared through its built dist.
+      - name: Build shared
+        run: pnpm --filter @puente/shared build
+
+      # Without this the spec would skip and the job would go green having verified
+      # nothing — the exact false-green the conventions warn about.
+      - name: Require the token
+        env:
+          CF_TEST_API_TOKEN: ${{ secrets.CF_TEST_API_TOKEN }}
+        run: |
+          if [ -z "$CF_TEST_API_TOKEN" ]; then
+            echo "::error::CF_TEST_API_TOKEN is not set — the live check would silently skip."
+            exit 1
+          fi
+
+      - name: Live check
+        env:
+          CF_TEST_API_TOKEN: ${{ secrets.CF_TEST_API_TOKEN }}
+          PUENTE_E2E_ZONE: ${{ inputs.zone }}
+        run: pnpm test:live
