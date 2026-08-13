@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pauldvlp/puente/main/apps/web/public/og.png" alt="puente" width="640">
+</p>
+
 # @pauldvlp/puente
 
 This is a **scoped alias** for [`puente`](https://www.npmjs.com/package/puente) — the
