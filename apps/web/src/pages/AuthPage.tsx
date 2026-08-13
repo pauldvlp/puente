@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Cloud } from 'lucide-react';
+import { PuenteMark } from '../components/PuenteMark';
 import { useAuth } from '../lib/auth';
 import { errMessage } from '../lib/hooks';
 import { Button } from '../components/ui/button';
@@ -41,7 +41,7 @@ export function AuthPage({ hasAdmin }: { hasAdmin: boolean }) {
       </div>
       <div className="w-full max-w-[420px]">
         <div className="mb-5 grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/30">
-          <Cloud className="size-6" />
+          <PuenteMark className="size-6" />
         </div>
         <h1 className="text-2xl font-bold tracking-tight">
           {isRegister ? 'Welcome to puente' : 'Welcome back'}
