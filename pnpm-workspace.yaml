@@ -2,6 +2,14 @@ packages:
   - 'apps/*'
   - 'packages/*'
 
+# Two build-time carriers pin esbuild to versions with published advisories and have no
+# release that moves off them: tsup@8.5.1 asks for ^0.27.0 (< 0.28.1) and the deprecated
+# @esbuild-kit/core-utils, which drizzle-kit still drags in, asks for ~0.18.20 (<= 0.24.2).
+# Pinning core-utils to the same major drizzle-kit already resolves keeps the tree deduped.
+overrides:
+  'tsup>esbuild': '^0.28.1'
+  '@esbuild-kit/core-utils>esbuild': '^0.25.12'
+
 # Native / postinstall build scripts we explicitly trust and allow to run.
 # (pnpm 11 dropped `onlyBuiltDependencies` in favour of this map.)
 allowBuilds:
