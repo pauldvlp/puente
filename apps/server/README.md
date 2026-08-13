@@ -48,6 +48,11 @@ puente setup      # same, and drops you straight into the guided setup
 
 That's it. The first screen walks you through everything.
 
+The panel keeps running **in the background** and gives your terminal back, so closing it
+(or pressing Ctrl+C) no longer takes the tunnels down. Manage it with `puente status`,
+`puente logs -f`, `puente restart` and `puente stop`. Need it attached to the terminal
+instead — a container, a systemd unit, CI? Add `--foreground`.
+
 ### …or with Docker
 
 ```bash
@@ -103,11 +108,21 @@ When you provision a remote node, puente (over SSH):
 ## CLI
 
 ```bash
-puente [start]            # start the panel (default). --port <n>, --host <h>, --no-open
+puente [start]           # start the panel in the background (default command)
+                         #   --port <n>, --host <h>, --no-open, --foreground
 puente setup             # start + open the guided setup wizard
+puente stop              # stop the background panel (SIGTERM, then SIGKILL)
+puente restart           # stop + start, reusing the port/host it was on
+puente status            # running? pid, URL, uptime — exits 3 when stopped
+puente logs [-n 50] [-f] # show (or follow) the background log
 puente doctor            # check the local environment (Node, cloudflared, ssh)
 puente info              # print paths and version
 ```
+
+A background panel records its pid and URL in `~/.puente/daemon.json` and writes its output
+to `~/.puente/puente.log` (rotated to `puente.log.1` past 5 MB). A second `puente start`
+detects the running one instead of fighting it for the port; a state file left behind by a
+crash is cleaned up automatically.
 
 Environment variables: `PUENTE_PORT` (default `5006`), `PUENTE_DATA_DIR` (default `~/.puente`).
 

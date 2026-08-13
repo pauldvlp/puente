@@ -18,7 +18,8 @@ export default defineConfig({
     // The data dir is wiped in the command, not in globalSetup: Playwright waits for the
     // server to be ready before globalSetup runs, so first-run state must exist by then.
     // Requires `pnpm build` first (CI builds in the same job).
-    command: `rm -rf ${DATA_DIR} && node apps/server/dist/cli.js start --port ${PORT} --host 127.0.0.1 --no-open`,
+    // --foreground: Playwright owns the process lifetime, so start must not detach.
+    command: `rm -rf ${DATA_DIR} && node apps/server/dist/cli.js start --foreground --port ${PORT} --host 127.0.0.1 --no-open`,
     url: `http://127.0.0.1:${PORT}`,
     timeout: 120_000,
     reuseExistingServer: false, // always a fresh, admin-less DB

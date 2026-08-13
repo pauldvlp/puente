@@ -13,7 +13,7 @@ Expose local ports — on this PC or on remote servers reached over SSH — on y
 </p>
 
 ```bash
-npx puente           # run it right now — opens the panel + guided setup
+npx puente           # run it right now — panel + guided setup, in the background
 # or install it:
 npm install -g puente && puente
 ```
@@ -59,6 +59,10 @@ docker compose up -d       # panel on http://localhost:5006
 Then open **http://localhost:5006** — the first screen walks you through everything.
 See the [full setup guide](apps/server/README.md#first-run-setup-about-2-minutes),
 including the exact Cloudflare API token scopes.
+
+The panel runs **in the background** and hands your terminal back: `puente status`,
+`puente logs -f`, `puente restart`, `puente stop`. Use `puente start --foreground` when
+something else owns the process lifetime (Docker, systemd, CI).
 
 ## Stack
 

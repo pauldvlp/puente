@@ -14,6 +14,10 @@ export const JWT_SECRET_PATH = join(DATA_DIR, 'jwt.secret');
 export const KEYS_DIR = join(DATA_DIR, 'keys');
 /** Downloaded cloudflared binary for the local node (when not on PATH). */
 export const BIN_DIR = join(DATA_DIR, 'bin');
+/** Where a running panel records its pid, port and URL so other CLI calls can find it. */
+export const DAEMON_STATE_PATH = join(DATA_DIR, 'daemon.json');
+/** stdout + stderr of the panel when it runs in the background. */
+export const LOG_PATH = join(DATA_DIR, 'puente.log');
 
 /** Create the data directory tree with tight permissions. Idempotent. */
 export function ensureDataDir(): void {
