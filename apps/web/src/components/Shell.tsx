@@ -1,7 +1,6 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   Activity,
-  Cloud,
   LayoutDashboard,
   LogOut,
   Server,
@@ -10,6 +9,7 @@ import {
   Wifi,
   WifiOff,
 } from 'lucide-react';
+import { PuenteMark } from './PuenteMark';
 import { useAuth } from '../lib/auth';
 import { useLive } from '../lib/live';
 import { useNodes, useRoutes } from '../lib/hooks';
@@ -56,7 +56,7 @@ export function Shell() {
         <aside className="hidden flex-col gap-1 border-r border-panel-border/70 p-4 md:flex">
           <div className="flex items-center gap-2.5 px-2 pb-4 pt-1">
             <span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-sm shadow-primary/30">
-              <Cloud className="size-5" />
+              <PuenteMark className="size-5" />
             </span>
             <span className="text-[1.05rem] font-bold tracking-tight">puente</span>
           </div>
