@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0](https://github.com/pauldvlp/puente/compare/v0.1.3...v0.2.0) (2026-08-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cli:** `puente start` no longer stays attached to the terminal. Anything that owns the process lifetime — Docker, systemd, CI — must pass `--foreground`. The bundled Dockerfile and the Playwright webServer already do.
+
+### ✨ Features
+
+* **cli:** run the panel in the background by default ([22e05db](https://github.com/pauldvlp/puente/commit/22e05db1990441b32041c97c9152659719847b0d))
+
 ## [0.1.3](https://github.com/pauldvlp/puente/compare/v0.1.2...v0.1.3) (2026-08-13)
 
 
