@@ -1,4 +1,6 @@
-# ☁️ puente
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pauldvlp/puente/main/apps/web/public/og.png" alt="puente" width="640">
+</p>
 
 **A centralized, self-hosted control panel for Cloudflare Tunnels across all your machines.**
 

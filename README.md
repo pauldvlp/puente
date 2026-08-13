@@ -1,4 +1,6 @@
-# ☁️ puente
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pauldvlp/puente/main/apps/web/public/og.png" alt="puente" width="640">
+</p>
 
 **A centralized, self-hosted manager for Cloudflare Tunnels across your machines.**
 Expose local ports — on this PC or on remote servers reached over SSH — on your own subdomains, from one beautiful web UI.
