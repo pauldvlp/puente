@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/pauldvlp/puente/compare/v0.1.2...v0.1.3) (2026-08-13)
+
+
+### 🐛 Bug Fixes
+
+* **deps:** bump the npm group across 1 directory with 23 updates ([c006344](https://github.com/pauldvlp/puente/commit/c0063442c16c3b6bdfc9f637d3239831ce9ebd08))
+
 ## [0.1.2](https://github.com/pauldvlp/puente/compare/v0.1.1...v0.1.2) (2026-07-23)
 
 
