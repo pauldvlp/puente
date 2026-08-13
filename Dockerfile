@@ -31,6 +31,7 @@ COPY --from=build /tmp/puente-*.tgz /tmp/
 RUN npm install -g /tmp/puente-*.tgz && rm /tmp/puente-*.tgz
 
 EXPOSE 5006
+# --foreground: the container's main process must not detach.
 # --no-open: never try to launch a browser inside the container.
 ENTRYPOINT ["puente"]
-CMD ["start", "--host", "0.0.0.0", "--no-open"]
+CMD ["start", "--foreground", "--host", "0.0.0.0", "--no-open"]
