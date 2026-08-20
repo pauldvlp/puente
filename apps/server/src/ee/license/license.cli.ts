@@ -1,3 +1,4 @@
+import { UPGRADE_URL } from '@puente/shared';
 import { LicenseService } from './license.service';
 import { DbService } from '../../db/db.service';
 
@@ -43,7 +44,7 @@ function print(licenses: LicenseService): void {
     console.log('\n  puente Community — AGPL-3.0, unlimited nodes and routes.');
     if (status.problem) console.log(`  Stored key unusable: ${status.problem}`);
     console.log('  Pro adds team accounts, workspaces, alerts, backups and an audit log.');
-    console.log('  https://puente.dev/pricing\n');
+    console.log(`  ${UPGRADE_URL}\n`);
     return;
   }
   console.log(`\n  puente ${status.plan?.toUpperCase()} — licensed to ${status.licensee}`);

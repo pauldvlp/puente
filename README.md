@@ -116,8 +116,8 @@ pnpm build                          # → apps/server/dist is a self-contained, 
 
 Community is not a trial: no node cap, no route cap, no time limit, no telemetry. Pro adds what a
 team or an agency needs on top, and its license key is verified **offline** — puente never phones
-home at any edition. See [LICENSING.md](./LICENSING.md), and
-[pricing](https://puente.dev/pricing).
+home at any edition. See [LICENSING.md](./LICENSING.md); for a quote, email
+[johanpaulbarahona@gmail.com](mailto:johanpaulbarahona@gmail.com).
 
 ```bash
 puente license                    # what edition am I running?

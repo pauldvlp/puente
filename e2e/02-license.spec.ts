@@ -67,6 +67,11 @@ test('a fresh install reports Community and offers to activate a key', async ({ 
 
   // The free edition must not advertise a cap it does not have.
   await expect(main.getByText(/Unlimited nodes, unlimited routes/)).toBeVisible();
+
+  // The upgrade link must go somewhere we own. It pointed at puente.dev — someone else's
+  // domain — which would have sent paying customers to a stranger's server.
+  const upgrade = main.getByRole('link', { name: /Compare editions/i });
+  await expect(upgrade).toHaveAttribute('href', /^https:\/\/github\.com\/pauldvlp\//);
 });
 
 test('a key that is not ours is refused, and nothing changes', async ({ page }) => {
