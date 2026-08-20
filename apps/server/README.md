@@ -182,7 +182,9 @@ Tunnels are **remotely-managed** (`config_src: cloudflare`): configuration lives
 
 ## Contributing & security
 
-puente is open source (MIT). Contributions are welcome — see
+puente is open source (AGPL-3.0), with a commercially-licensed `ee/` directory for the Pro
+edition — see [LICENSING.md](https://github.com/pauldvlp/puente/blob/main/LICENSING.md).
+Contributions are welcome — see
 [CONTRIBUTING.md](https://github.com/pauldvlp/puente/blob/main/CONTRIBUTING.md).
 Found a vulnerability? Please report it privately per our
 [Security Policy](https://github.com/pauldvlp/puente/blob/main/SECURITY.md).
@@ -191,4 +193,4 @@ Source & issues: **https://github.com/pauldvlp/puente**
 
 ---
 
-MIT © [pauldvlp](https://github.com/pauldvlp)
+AGPL-3.0-or-later © [Paul Barahona](https://github.com/pauldvlp)

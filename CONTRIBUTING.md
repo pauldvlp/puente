@@ -39,6 +39,14 @@ packages/
   alias/     Thin package that re-exports `puente` under @pauldvlp/puente
 ```
 
+Two directories are special: `apps/server/src/ee/` and `apps/web/src/ee/` hold the paid edition
+and are covered by the [puente Commercial License](./LICENSE-COMMERCIAL.md) instead of the AGPL.
+Read them, audit them, report bugs against them — but a contribution that adds a **free** feature
+belongs outside `ee/`. The dependency runs one way: `ee/` uses the core freely, while the core only
+touches `ee/` at the few mount points that wire it in (the Nest module, the settings page, the
+`license` CLI command). Keep it that way and the free edition never grows a hole where a paid
+feature used to be.
+
 ## Getting started
 
 ```bash
@@ -131,6 +139,11 @@ docs: clarify the required Cloudflare token scopes
 5. Fill in the PR template, describing what you changed and how you tested it.
 6. Open the PR against `main`. CI will run typecheck + build + a packaging smoke
    test.
+
+By opening a pull request you agree to the [Contributor License Agreement](./CLA.md). It is short:
+you keep your copyright, and you let the maintainer ship your code under both of the project's
+licenses. puente is dual-licensed and that is what pays for it being maintained — see
+[LICENSING.md](./LICENSING.md).
 
 A maintainer will review. Once merged, [release-please](https://github.com/googleapis/release-please)
 rolls your change into the next version and changelog automatically — you don't
