@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- build stage: compile the SPA + server and pack a self-contained tarball ----
-FROM node:20-bookworm-slim AS build
+FROM node:24-bookworm-slim AS build
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 RUN corepack enable
@@ -14,7 +14,7 @@ RUN pnpm install --frozen-lockfile \
  && npm pack --pack-destination /tmp
 
 # ---- runtime stage: install the tarball globally, run as the `puente` CLI ----
-FROM node:20-bookworm-slim AS runtime
+FROM node:24-bookworm-slim AS runtime
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates \
  && rm -rf /var/lib/apt/lists/*

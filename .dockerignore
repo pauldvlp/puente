@@ -9,3 +9,7 @@
 .puente
 *.log
 coverage
+
+# Local agent memory and notes — never travel into an image
+.memory
+CLAUDE.md
