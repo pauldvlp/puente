@@ -7,6 +7,8 @@ import {
   type CloudflareZone,
   type CreateNodeInput,
   type CreateRouteInput,
+  type ActivateLicenseInput,
+  type LicenseStatus,
   type LoginInput,
   type Node as PuenteNode,
   type ProvisionNodeInput,
@@ -148,6 +150,11 @@ export const api = {
   },
   events: {
     list: () => get<ActivityEvent[]>('/events'),
+  },
+  license: {
+    get: () => get<LicenseStatus>('/license'),
+    activate: (b: ActivateLicenseInput) => post<LicenseStatus>('/license', b),
+    deactivate: () => del<LicenseStatus>('/license'),
   },
   ssh: {
     configHosts: () => get<SshConfigHost[]>('/ssh/config-hosts'),

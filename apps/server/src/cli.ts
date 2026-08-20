@@ -7,6 +7,7 @@ import { platform } from 'node:os';
 import { bootstrap } from './main';
 import { DATA_DIR, DB_PATH, LOG_PATH } from './config/paths';
 import { APP_VERSION } from './config/version';
+import { runLicenseCommand } from './ee/license/license.cli';
 import {
   DaemonStartError,
   clearState,
@@ -240,6 +241,19 @@ program
     console.log(`  database : ${DB_PATH}`);
     console.log(`  logs     : ${LOG_PATH}`);
     console.log(`  node     : ${process.version}`);
+  });
+
+program
+  .command('license [action] [key]')
+  .description('Show, activate or remove the puente Pro license (actions: activate, remove)')
+  .action((action: string | undefined, key: string | undefined) => {
+    const verb = action ?? 'show';
+    if (verb !== 'show' && verb !== 'activate' && verb !== 'remove') {
+      console.error(`Unknown action "${verb}". Use: puente license [activate <key> | remove]`);
+      process.exitCode = 1;
+      return;
+    }
+    runLicenseCommand(verb, key);
   });
 
 program
