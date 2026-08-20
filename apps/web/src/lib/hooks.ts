@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type {
+  ActivateLicenseInput,
   CreateNodeInput,
   CreateRouteInput,
   ProvisionNodeInput,
@@ -34,6 +35,35 @@ export const useSettings = () => useQuery({ queryKey: qk.settings, queryFn: api.
 
 export const useEvents = () =>
   useQuery({ queryKey: qk.events, queryFn: api.events.list, refetchInterval: 20000 });
+
+/** Current edition. Cached hard: a license changes when someone pastes a key, not on its own. */
+export const useLicense = () =>
+  useQuery({ queryKey: qk.license, queryFn: api.license.get, staleTime: 60_000 });
+
+export function useLicenseMutations() {
+  const qc = useQueryClient();
+  const invalidate = () => qc.invalidateQueries({ queryKey: qk.license });
+
+  const activate = useMutation({
+    mutationFn: (b: ActivateLicenseInput) => api.license.activate(b),
+    onSuccess: (status) => {
+      invalidate();
+      toast.success(`puente Pro activated for ${status.licensee}`);
+    },
+    onError: notifyError,
+  });
+
+  const deactivate = useMutation({
+    mutationFn: () => api.license.deactivate(),
+    onSuccess: () => {
+      invalidate();
+      toast.success('License removed — running as Community');
+    },
+    onError: notifyError,
+  });
+
+  return { activate, deactivate };
+}
 
 // --- Node mutations --------------------------------------------------------
 

@@ -28,6 +28,7 @@ import {
   DialogTitle,
 } from '../components/ui/dialog';
 import { ConnectCloudflare } from '../components/ConnectCloudflare';
+import { LicenseCard } from '../ee/LicenseCard';
 
 const NONE = '__none__';
 
@@ -52,7 +53,7 @@ export function SettingsPage() {
       <header className="mb-5">
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Cloudflare connection, preferences and about.
+          Cloudflare connection, license, preferences and about.
         </p>
       </header>
 
@@ -109,6 +110,8 @@ export function SettingsPage() {
           )}
         </div>
       </Card>
+
+      <LicenseCard />
 
       {/* Preferences */}
       <Card className="mb-6 gap-0 py-0">

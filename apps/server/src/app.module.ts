@@ -13,6 +13,7 @@ import { CloudflaredModule } from './modules/cloudflared/cloudflared.module';
 import { RoutesModule } from './modules/routes/routes.module';
 import { NodesModule } from './modules/nodes/nodes.module';
 import { SetupController } from './modules/setup/setup.controller';
+import { EeModule } from './ee/ee.module';
 
 // The built SPA is copied next to the compiled server (dist/public) at publish.
 const PUBLIC_DIR = join(__dirname, 'public');
@@ -34,6 +35,7 @@ const PUBLIC_DIR = join(__dirname, 'public');
     SettingsModule,
     CloudflareModule,
     AuthModule,
+    EeModule,
     SshModule,
     CloudflaredModule,
     RoutesModule,

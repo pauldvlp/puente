@@ -20,4 +20,5 @@ export const qk = {
   settings: ['settings'] as const,
   events: ['events'] as const,
   sshHosts: ['ssh-hosts'] as const,
+  license: ['license'] as const,
 };

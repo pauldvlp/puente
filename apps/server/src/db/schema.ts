@@ -87,9 +87,18 @@ export const events = sqliteTable('events', {
   meta: text('meta', { mode: 'json' }).$type<Record<string, unknown>>(),
 });
 
+export const license = sqliteTable('license', {
+  id: text('id').primaryKey(), // always 'current'
+  key: text('key').notNull(),
+  licenseId: text('license_id').notNull(),
+  activatedAt: integer('activated_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
 export type UserRow = typeof users.$inferSelect;
 export type SettingsRow = typeof settings.$inferSelect;
 export type ZoneRow = typeof zones.$inferSelect;
 export type NodeRow = typeof nodes.$inferSelect;
 export type RouteRow = typeof routes.$inferSelect;
 export type EventRow = typeof events.$inferSelect;
+export type LicenseRow = typeof license.$inferSelect;

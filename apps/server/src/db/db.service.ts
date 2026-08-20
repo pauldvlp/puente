@@ -97,6 +97,14 @@ CREATE TABLE IF NOT EXISTS events (
   meta TEXT
 );
 
+CREATE TABLE IF NOT EXISTS license (
+  id TEXT PRIMARY KEY,
+  key TEXT NOT NULL,
+  license_id TEXT NOT NULL,
+  activated_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_routes_node ON routes(node_id);
 CREATE INDEX IF NOT EXISTS idx_events_ts ON events(ts);
 `;
