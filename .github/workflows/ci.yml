@@ -135,7 +135,59 @@ jobs:
           cd "$workdir"
           npm init -y >/dev/null
           npm install "$GITHUB_WORKSPACE"/pkg/puente-*.tgz
-          echo "— puente --version —"
-          ./node_modules/.bin/puente --version
+
+          # The version the CLI reports must be the version npm serves. These drifted
+          # apart once already (0.1.0 reported while 0.2.0 shipped), and the smoke job
+          # printed it without ever comparing it.
+          expected="$(node -p "require('$workdir/node_modules/puente/package.json').version")"
+          actual="$(./node_modules/.bin/puente --version)"
+          echo "manifest=$expected  cli=$actual"
+          if [ "$expected" != "$actual" ]; then
+            echo "::error::puente --version says $actual but the published manifest says $expected"
+            exit 1
+          fi
+
           echo "— puente info —"
           ./node_modules/.bin/puente info
+
+  docker:
+    name: Docker image builds and serves
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # buildx is what makes `cache-from: type=gha` and `load: true` work together.
+      - uses: docker/setup-buildx-action@v4
+
+      # The compose file is how a lot of people will run puente, and until now nothing
+      # checked that it still builds. It rotted onto EOL node:20 unnoticed for months.
+      - name: Build the image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          load: true
+          tags: puente:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: The runtime must not be EOL
+        run: |
+          set -euo pipefail
+          major="$(docker run --rm --entrypoint node puente:ci --version | sed 's/^v\([0-9]*\).*/\1/')"
+          echo "container runs Node $major"
+          [ "$major" -ge 22 ] || { echo "::error::image runs EOL Node $major"; exit 1; }
+
+      - name: Start it and serve the panel
+        run: |
+          set -euo pipefail
+          docker run -d --name puente-ci -p 5006:5006 puente:ci
+          for _ in $(seq 1 30); do
+            code="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5006/ || true)"
+            [ "$code" = "200" ] && break
+            sleep 2
+          done
+          [ "$code" = "200" ] || { echo "::error::panel never answered (last status ${code:-none})"; docker logs puente-ci; exit 1; }
+          # A fresh container must report first-run state and the real version.
+          curl -sf http://127.0.0.1:5006/api/setup/status | tee /dev/stderr | grep -q '"hasAdmin":false'
+          docker rm -f puente-ci >/dev/null
