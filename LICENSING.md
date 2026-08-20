@@ -30,7 +30,8 @@ scheduled backups, alerting, multi-account workspaces). They are **source-availa
 source**: you can read them, audit them and patch them for your own licensed deployment, but
 running them requires a valid license key, and redistribution is not permitted.
 
-Buy a license: **https://puente.dev/pricing** · questions: **johanpaulbarahona@gmail.com**
+Buy a license: email **johanpaulbarahona@gmail.com** — see the edition comparison in the
+[README](./README.md#editions).
 
 ## Which one do I need?
 

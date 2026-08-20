@@ -103,8 +103,14 @@ export const ActivateLicenseSchema = z.object({
 });
 export type ActivateLicenseInput = z.infer<typeof ActivateLicenseSchema>;
 
-/** Shown wherever a Pro-only affordance is displayed to a Community user. */
-export const UPGRADE_URL = 'https://puente.dev/pricing';
+/**
+ * Shown wherever a Pro-only affordance is displayed to a Community user.
+ *
+ * Deliberately a GitHub URL and not puente.dev: that domain is registered to someone else, and
+ * pointing the product's own upgrade button at a stranger's server is worse than having no landing
+ * page at all. Swap this the day a domain is actually owned — it is the only place to change.
+ */
+export const UPGRADE_URL = 'https://github.com/pauldvlp/puente#editions';
 
 export const COMMUNITY_STATUS: LicenseStatus = {
   edition: 'community',
