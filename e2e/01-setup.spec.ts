@@ -56,6 +56,20 @@ test('signing out returns to the login form and the credentials still work', asy
   await signIn(page);
 });
 
+test('the panel reports the version the server is actually running', async ({ page }) => {
+  await signIn(page);
+  await page.locator('a[href="/settings"]').first().click();
+
+  // Was a hard-coded 'v0.1.0' in the JSX while the server ran 0.2.0. Compare the rendered
+  // string against what the API reports, so the two can never drift apart again.
+  const reported = await page.evaluate(async () => {
+    const res = await fetch('/api/setup/status');
+    return ((await res.json()) as { version: string }).version;
+  });
+  await expect(page.getByTestId('app-version')).toHaveText(`v${reported}`);
+  expect(reported).toMatch(/^\d+\.\d+\.\d+/);
+});
+
 test('a protected route is not reachable without a session', async ({ page }) => {
   await page.goto('/settings');
   await expect(page).toHaveURL(/\/login$/);
