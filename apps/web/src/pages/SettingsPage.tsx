@@ -4,6 +4,7 @@ import {
   useCloudflareConnection,
   useCloudflareMutations,
   useSettings,
+  useSetupStatus,
   useUpdateSettings,
   useZones,
 } from '../lib/hooks';
@@ -36,6 +37,7 @@ const NONE = '__none__';
 export function SettingsPage() {
   const cf = useCloudflareConnection();
   const settings = useSettings();
+  const setup = useSetupStatus();
   const zones = useZones();
   const { disconnect, refreshZones } = useCloudflareMutations();
   const updateSettings = useUpdateSettings();
@@ -179,7 +181,10 @@ export function SettingsPage() {
         <div className="flex flex-col gap-2 p-5 text-sm text-muted-foreground">
           <div className="flex items-center justify-between">
             <span>Version</span>
-            <span className="font-mono">{settings.data ? 'v0.1.0' : '—'}</span>
+            {/* From the server, not a literal: this said v0.1.0 while 0.2.0 was installed. */}
+            <span className="font-mono" data-testid="app-version">
+              {setup.data ? `v${setup.data.version}` : '—'}
+            </span>
           </div>
           <div className="flex items-center justify-between gap-4">
             <span>Data directory</span>
