@@ -95,6 +95,22 @@ export const license = sqliteTable('license', {
   updatedAt: integer('updated_at').notNull(),
 });
 
+export const alertChannels = sqliteTable('alert_channels', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  kind: text('kind').notNull(), // 'webhook' | 'slack' | 'discord'
+  /** The destination URL *is* the credential for Slack and Discord, so it is encrypted at rest. */
+  urlEnc: text('url_enc').notNull(),
+  enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+  triggers: text('triggers', { mode: 'json' }).notNull().$type<string[]>(),
+  /** subject id -> epoch millis of the last alert sent about it, for the cooldown. */
+  cooldown: text('cooldown', { mode: 'json' }).$type<Record<string, number>>(),
+  lastDeliveryAt: integer('last_delivery_at'),
+  lastError: text('last_error'),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
 export type UserRow = typeof users.$inferSelect;
 export type SettingsRow = typeof settings.$inferSelect;
 export type ZoneRow = typeof zones.$inferSelect;
@@ -102,3 +118,4 @@ export type NodeRow = typeof nodes.$inferSelect;
 export type RouteRow = typeof routes.$inferSelect;
 export type EventRow = typeof events.$inferSelect;
 export type LicenseRow = typeof license.$inferSelect;
+export type AlertChannelRow = typeof alertChannels.$inferSelect;

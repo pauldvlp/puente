@@ -8,6 +8,10 @@ import {
   type CreateNodeInput,
   type CreateRouteInput,
   type ActivateLicenseInput,
+  type AlertChannel,
+  type AlertDelivery,
+  type CreateAlertChannelInput,
+  type UpdateAlertChannelInput,
   type LicenseStatus,
   type LoginInput,
   type Node as PuenteNode,
@@ -155,6 +159,14 @@ export const api = {
     get: () => get<LicenseStatus>('/license'),
     activate: (b: ActivateLicenseInput) => post<LicenseStatus>('/license', b),
     deactivate: () => del<LicenseStatus>('/license'),
+  },
+  alerts: {
+    list: () => get<AlertChannel[]>('/alerts/channels'),
+    create: (b: CreateAlertChannelInput) => post<AlertChannel>('/alerts/channels', b),
+    update: (id: string, b: UpdateAlertChannelInput) =>
+      patch<AlertChannel>(`/alerts/channels/${id}`, b),
+    remove: (id: string) => del<{ ok: true }>(`/alerts/channels/${id}`),
+    test: (id: string) => post<AlertDelivery>(`/alerts/channels/${id}/test`),
   },
   ssh: {
     configHosts: () => get<SshConfigHost[]>('/ssh/config-hosts'),

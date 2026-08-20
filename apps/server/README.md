@@ -135,6 +135,29 @@ Environment variables: `PUENTE_PORT` (default `5006`), `PUENTE_DATA_DIR` (defaul
 
 ---
 
+## Alerts (Pro)
+
+A `webhook` channel receives a POST with this body — versioned and safe to parse:
+
+```json
+{
+  "v": 1,
+  "trigger": "node.down",
+  "text": "Node vps-fra is down (was healthy)",
+  "severity": "critical",
+  "subject": { "kind": "node", "id": "node_...", "name": "vps-fra" },
+  "from": "healthy",
+  "to": "down",
+  "at": "2026-08-20T22:31:00.000Z"
+}
+```
+
+Slack and Discord channels get the shape each of them expects instead (`{ text }` and
+`{ content }`). Recoveries are sent as well as failures, and a 10-minute cooldown per subject keeps
+a flapping tunnel from turning into a thousand messages — recoveries ignore the cooldown, because a
+late all-clear is useless. Nothing fires for `inactive`: that is what stopping a connector on
+purpose looks like, and paging someone for doing what they asked is how alerting gets muted.
+
 ## Data & security
 
 - All state lives in **`~/.puente/`** (SQLite database, encryption key, managed SSH keys).

@@ -69,8 +69,10 @@ test('a fresh install reports Community and offers to activate a key', async ({ 
   await expect(main.getByText(/Unlimited nodes, unlimited routes/)).toBeVisible();
 
   // The upgrade link must go somewhere we own. It pointed at puente.dev — someone else's
-  // domain — which would have sent paying customers to a stranger's server.
-  const upgrade = main.getByRole('link', { name: /Compare editions/i });
+  // domain — which would have sent paying customers to a stranger's server. Scoped to this card:
+  // every Pro upsell in the panel carries the same link.
+  const licenceCard = main.locator('[data-slot="card"]').filter({ hasText: 'License key' });
+  const upgrade = licenceCard.getByRole('link', { name: /Compare editions/i });
   await expect(upgrade).toHaveAttribute('href', /^https:\/\/github\.com\/pauldvlp\//);
 });
 

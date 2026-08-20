@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type {
   ActivateLicenseInput,
+  CreateAlertChannelInput,
+  UpdateAlertChannelInput,
   CreateNodeInput,
   CreateRouteInput,
   ProvisionNodeInput,
@@ -39,6 +41,52 @@ export const useEvents = () =>
 /** Current edition. Cached hard: a license changes when someone pastes a key, not on its own. */
 export const useLicense = () =>
   useQuery({ queryKey: qk.license, queryFn: api.license.get, staleTime: 60_000 });
+
+/** Alert channels. Pro-only: the endpoint 403s on Community, so this only runs when unlocked. */
+export const useAlertChannels = (enabled: boolean) =>
+  useQuery({ queryKey: qk.alertChannels, queryFn: api.alerts.list, enabled });
+
+export function useAlertMutations() {
+  const qc = useQueryClient();
+  const invalidate = () => qc.invalidateQueries({ queryKey: qk.alertChannels });
+
+  const create = useMutation({
+    mutationFn: (b: CreateAlertChannelInput) => api.alerts.create(b),
+    onSuccess: () => {
+      invalidate();
+      toast.success('Alert channel added');
+    },
+    onError: notifyError,
+  });
+
+  const update = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: UpdateAlertChannelInput }) =>
+      api.alerts.update(id, body),
+    onSuccess: invalidate,
+    onError: notifyError,
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) => api.alerts.remove(id),
+    onSuccess: () => {
+      invalidate();
+      toast.success('Alert channel removed');
+    },
+    onError: notifyError,
+  });
+
+  const test = useMutation({
+    mutationFn: (id: string) => api.alerts.test(id),
+    onSuccess: (delivery) => {
+      invalidate();
+      if (delivery.ok) toast.success('Test alert delivered');
+      else toast.error(delivery.message);
+    },
+    onError: notifyError,
+  });
+
+  return { create, update, remove, test };
+}
 
 export function useLicenseMutations() {
   const qc = useQueryClient();

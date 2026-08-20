@@ -8,6 +8,7 @@ export * from './settings.js';
 export * from './events.js';
 export * from './stream.js';
 export * from './license.js';
+export * from './alerts.js';
 
 /** API route prefix for every backend endpoint. */
 export const API_PREFIX = '/api';
