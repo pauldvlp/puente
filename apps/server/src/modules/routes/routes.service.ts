@@ -260,11 +260,23 @@ export class RoutesService {
       message = err instanceof Error ? err.message : String(err);
     }
     const checkedAt = nowMs();
+    const previous = row.health;
     this.patch(id, {
       health,
       lastCheckedAt: checkedAt,
       lastError: health === 'healthy' ? null : message,
     });
+    if (previous !== health) {
+      this.bus.fact({
+        type: 'health.changed',
+        subject: 'route',
+        id: row.id,
+        name: row.hostname,
+        from: previous,
+        to: health,
+        at: checkedAt,
+      });
+    }
     this.emitUpdated(id);
     return { health, httpStatus, message, checkedAt: toIsoStrict(checkedAt) };
   }

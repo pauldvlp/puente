@@ -29,6 +29,7 @@ import {
 } from '../components/ui/dialog';
 import { ConnectCloudflare } from '../components/ConnectCloudflare';
 import { LicenseCard } from '../ee/LicenseCard';
+import { AlertsCard } from '../ee/AlertsCard';
 
 const NONE = '__none__';
 
@@ -112,6 +113,8 @@ export function SettingsPage() {
       </Card>
 
       <LicenseCard />
+
+      <AlertsCard />
 
       {/* Preferences */}
       <Card className="mb-6 gap-0 py-0">

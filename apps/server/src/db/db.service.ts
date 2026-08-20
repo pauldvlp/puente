@@ -105,6 +105,20 @@ CREATE TABLE IF NOT EXISTS license (
   updated_at INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS alert_channels (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  url_enc TEXT NOT NULL,
+  enabled INTEGER NOT NULL DEFAULT 1,
+  triggers TEXT NOT NULL,
+  cooldown TEXT,
+  last_delivery_at INTEGER,
+  last_error TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_routes_node ON routes(node_id);
 CREATE INDEX IF NOT EXISTS idx_events_ts ON events(ts);
 `;

@@ -380,6 +380,17 @@ export class NodesService {
             tunnelStatus: info.status,
             connectionCount: info.connectionCount,
           });
+          if (n.tunnelStatus !== info.status) {
+            this.bus.fact({
+              type: 'health.changed',
+              subject: 'node',
+              id: n.id,
+              name: n.name,
+              from: n.tunnelStatus,
+              to: info.status,
+              at: nowMs(),
+            });
+          }
           this.emitUpdated(n.id);
         }
       } catch {

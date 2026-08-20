@@ -3,6 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { LicenseController } from './license/license.controller';
 import { LicenseService } from './license/license.service';
 import { ProGuard } from './license/pro.guard';
+import { AlertsModule } from './alerts/alerts.module';
 
 /**
  * puente Pro. Licensed under the puente Commercial License — see `ee/LICENSE.md`.
@@ -12,6 +13,7 @@ import { ProGuard } from './license/pro.guard';
  */
 @Global()
 @Module({
+  imports: [AlertsModule],
   controllers: [LicenseController],
   providers: [LicenseService, ProGuard, { provide: APP_GUARD, useClass: ProGuard }],
   exports: [LicenseService, ProGuard],
