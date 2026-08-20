@@ -8,7 +8,7 @@ Expose local ports — on this PC or on remote servers reached over SSH — on y
 <p>
   <a href="https://www.npmjs.com/package/puente"><img alt="npm" src="https://img.shields.io/npm/v/puente?color=%230b7285&label=puente"></a>
   <a href="https://github.com/pauldvlp/puente/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/pauldvlp/puente/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <a href="./LICENSE"><img alt="License: AGPL-3.0" src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg"></a>
   <img alt="Node >= 22" src="https://img.shields.io/badge/node-%3E%3D22-brightgreen">
 </p>
 
@@ -98,6 +98,32 @@ pnpm typecheck
 pnpm build                          # → apps/server/dist is a self-contained, publishable package
 ```
 
+## Editions
+
+|                                                 | Community    | Pro          |
+| ----------------------------------------------- | ------------ | ------------ |
+| Tunnels, routes, DNS                            | ✅           | ✅           |
+| Local + remote nodes over SSH                   | ✅ unlimited | ✅ unlimited |
+| Connector install / upgrade / repair            | ✅           | ✅           |
+| Live status, activity feed, CLI                 | ✅           | ✅           |
+| Team accounts & roles                           | —            | ✅           |
+| Client workspaces (several Cloudflare accounts) | —            | ✅           |
+| Alerting when a node or route degrades          | —            | ✅           |
+| Scheduled backup & restore                      | —            | ✅           |
+| Exportable audit log                            | —            | ✅           |
+| API tokens · fleet operations · SSO             | —            | ✅           |
+| License                                         | AGPL-3.0     | commercial   |
+
+Community is not a trial: no node cap, no route cap, no time limit, no telemetry. Pro adds what a
+team or an agency needs on top, and its license key is verified **offline** — puente never phones
+home at any edition. See [LICENSING.md](./LICENSING.md), and
+[pricing](https://puente.dev/pricing).
+
+```bash
+puente license                    # what edition am I running?
+puente license activate <key>     # paste a Pro key (or set PUENTE_LICENSE_KEY)
+```
+
 ## Contributing
 
 Contributions are welcome! Please read **[CONTRIBUTING.md](./CONTRIBUTING.md)** (dev
@@ -114,4 +140,5 @@ Please report vulnerabilities privately — see **[SECURITY.md](./SECURITY.md)**
 
 ---
 
-MIT © [pauldvlp](https://github.com/pauldvlp) — see [LICENSE](./LICENSE).
+AGPL-3.0-or-later © [Paul Barahona](https://github.com/pauldvlp), with a commercial license for
+`ee/` — see [LICENSING.md](./LICENSING.md).

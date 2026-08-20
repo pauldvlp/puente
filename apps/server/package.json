@@ -2,7 +2,7 @@
   "name": "puente",
   "version": "0.2.0",
   "description": "Centralized, self-hosted manager for Cloudflare Tunnels across your machines — expose local ports on your own subdomains, orchestrate remote nodes over SSH.",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "author": "Paul Barahona <johanpaulbarahona@gmail.com>",
   "homepage": "https://github.com/pauldvlp/puente#readme",
   "repository": {
@@ -31,7 +31,8 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "LICENSE-COMMERCIAL.md"
   ],
   "engines": {
     "node": ">=22.0.0"

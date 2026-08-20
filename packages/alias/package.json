@@ -2,7 +2,7 @@
   "name": "@pauldvlp/puente",
   "version": "0.1.0",
   "description": "Alias for the `puente` package — the self-hosted Cloudflare Tunnel manager. Installs and runs the exact same CLI under a scoped name.",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "author": "Paul Barahona <johanpaulbarahona@gmail.com>",
   "homepage": "https://github.com/pauldvlp/puente#readme",
   "repository": {

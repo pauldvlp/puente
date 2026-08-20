@@ -2,7 +2,7 @@
   "name": "@puente/shared",
   "version": "0.1.0",
   "description": "Shared contracts (zod schemas + TypeScript types) for @pauldvlp/puente",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
