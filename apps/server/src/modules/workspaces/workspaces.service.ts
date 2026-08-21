@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { asc, desc, eq } from 'drizzle-orm';
+import { WORKSPACE_LAST_ONE, WORKSPACE_NOT_EMPTY, type CreateWorkspaceInput } from '@puente/shared';
 import { DbService } from '../../db/db.service';
-import { workspaces, type WorkspaceRow } from '../../db/schema';
+import { nodes, routes, workspaces, zones, type WorkspaceRow } from '../../db/schema';
+import { newId } from '../../common/ids';
 import { nowMs } from '../../common/time';
 
 /**
@@ -68,6 +70,56 @@ export class WorkspacesService {
 
   exists(id: string): boolean {
     return Boolean(this.db.select().from(workspaces).where(eq(workspaces.id, id)).get());
+  }
+
+  create(dto: CreateWorkspaceInput): WorkspaceRow {
+    const now = nowMs();
+    const row: WorkspaceRow = {
+      id: newId('ws'),
+      name: dto.name,
+      cloudflareAuthMode: null,
+      cloudflareApiTokenEnc: null,
+      cloudflareAccountId: null,
+      cloudflareAccountName: null,
+      defaultZoneId: null,
+      isDefault: false,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.db.insert(workspaces).values(row).run();
+    return row;
+  }
+
+  /**
+   * Deleting a workspace is refused unless it is empty, and the last one can never go.
+   *
+   * A workspace holds another company's infrastructure. Cascading a delete from one click would
+   * tear down their tunnels, so the answer is to say what is still inside and let a human decide.
+   */
+  remove(id: string): void {
+    const row = this.get(id);
+    if (this.list().length <= 1) {
+      throw new BadRequestException({
+        statusCode: 400,
+        error: 'LastWorkspace',
+        message: 'This is the only workspace. puente always has one.',
+        code: WORKSPACE_LAST_ONE,
+      });
+    }
+    const nodeCount = this.db.select().from(nodes).where(eq(nodes.workspaceId, id)).all().length;
+    const routeCount = this.db.select().from(routes).where(eq(routes.workspaceId, id)).all().length;
+    if (nodeCount > 0 || routeCount > 0) {
+      throw new BadRequestException({
+        statusCode: 400,
+        error: 'WorkspaceNotEmpty',
+        message:
+          `"${row.name}" still has ${nodeCount} node(s) and ${routeCount} route(s). ` +
+          "Remove them first — deleting them from here would take down someone else's tunnels.",
+        code: WORKSPACE_NOT_EMPTY,
+      });
+    }
+    this.db.delete(zones).where(eq(zones.workspaceId, id)).run();
+    this.db.delete(workspaces).where(eq(workspaces.id, id)).run();
   }
 
   patch(id: string, patch: Partial<WorkspaceRow>): WorkspaceRow {

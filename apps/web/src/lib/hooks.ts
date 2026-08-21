@@ -3,7 +3,9 @@ import { toast } from 'sonner';
 import type {
   ActivateLicenseInput,
   CreateAlertChannelInput,
+  CreateWorkspaceInput,
   UpdateAlertChannelInput,
+  UpdateWorkspaceInput,
   CreateNodeInput,
   CreateRouteInput,
   ProvisionNodeInput,
@@ -12,7 +14,8 @@ import type {
   UpdateSettingsInput,
 } from '@puente/shared';
 import { api, ApiError } from './api';
-import { qk } from './query';
+import { qk, queryClient } from './query';
+import { setWorkspaceId } from './workspace';
 
 export const errMessage = (e: unknown): string =>
   e instanceof ApiError ? e.message : e instanceof Error ? e.message : String(e);
@@ -41,6 +44,53 @@ export const useEvents = () =>
 /** Current edition. Cached hard: a license changes when someone pastes a key, not on its own. */
 export const useLicense = () =>
   useQuery({ queryKey: qk.license, queryFn: api.license.get, staleTime: 60_000 });
+
+export const useWorkspaces = () =>
+  useQuery({ queryKey: qk.workspaces, queryFn: api.workspaces.list, staleTime: 30_000 });
+
+/**
+ * Switching workspace changes what every other query means, so the cache is thrown away rather
+ * than invalidated — showing one client's nodes under another client's name, even for a frame,
+ * is the one thing this feature must never do.
+ */
+export function useSwitchWorkspace() {
+  return (id: string) => {
+    setWorkspaceId(id);
+    queryClient.clear();
+  };
+}
+
+export function useWorkspaceMutations() {
+  const qc = useQueryClient();
+  const invalidate = () => qc.invalidateQueries({ queryKey: qk.workspaces });
+
+  const create = useMutation({
+    mutationFn: (b: CreateWorkspaceInput) => api.workspaces.create(b),
+    onSuccess: (ws) => {
+      invalidate();
+      toast.success(`Workspace "${ws.name}" created`);
+    },
+    onError: notifyError,
+  });
+
+  const rename = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: UpdateWorkspaceInput }) =>
+      api.workspaces.rename(id, body),
+    onSuccess: invalidate,
+    onError: notifyError,
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) => api.workspaces.remove(id),
+    onSuccess: () => {
+      invalidate();
+      toast.success('Workspace removed');
+    },
+    onError: notifyError,
+  });
+
+  return { create, rename, remove };
+}
 
 /** Alert channels. Pro-only: the endpoint 403s on Community, so this only runs when unlocked. */
 export const useAlertChannels = (enabled: boolean) =>

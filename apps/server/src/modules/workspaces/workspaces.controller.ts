@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
-import type { Workspace } from '@puente/shared';
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { UpdateWorkspaceSchema, type UpdateWorkspaceInput, type Workspace } from '@puente/shared';
+import { ZodBody } from '../../common/zod-validation.pipe';
 import { WorkspacesService } from './workspaces.service';
 import { toWorkspaceDto } from './workspace.mapper';
 
@@ -16,5 +17,14 @@ export class WorkspacesController {
   @Get('current')
   current(): Workspace {
     return toWorkspaceDto(this.workspaces.current());
+  }
+
+  /** Renaming is free: Community has a workspace, and naming your own things is not a feature. */
+  @Patch(':id')
+  rename(
+    @Param('id') id: string,
+    @Body(new ZodBody(UpdateWorkspaceSchema)) dto: UpdateWorkspaceInput,
+  ): Workspace {
+    return toWorkspaceDto(this.workspaces.patch(id, { name: dto.name }));
   }
 }
