@@ -4,6 +4,7 @@ import { LicenseController } from './license/license.controller';
 import { LicenseService } from './license/license.service';
 import { ProGuard } from './license/pro.guard';
 import { AlertsModule } from './alerts/alerts.module';
+import { WorkspacesProModule } from './workspaces/workspaces-pro.module';
 
 /**
  * puente Pro. Licensed under the puente Commercial License — see `ee/LICENSE.md`.
@@ -13,7 +14,7 @@ import { AlertsModule } from './alerts/alerts.module';
  */
 @Global()
 @Module({
-  imports: [AlertsModule],
+  imports: [AlertsModule, WorkspacesProModule],
   controllers: [LicenseController],
   providers: [LicenseService, ProGuard, { provide: APP_GUARD, useClass: ProGuard }],
   exports: [LicenseService, ProGuard],

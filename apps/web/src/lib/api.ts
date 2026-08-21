@@ -27,7 +27,12 @@ import {
   type SshTestResult,
   type UpdateRouteInput,
   type UpdateSettingsInput,
+  type UpdateWorkspaceInput,
+  type Workspace,
+  type CreateWorkspaceInput,
 } from '@puente/shared';
+
+import { getWorkspaceId, WORKSPACE_HEADER } from './workspace';
 
 const TOKEN_KEY = 'puente_token';
 
@@ -51,6 +56,9 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   const headers: Record<string, string> = {};
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
+  // Which Cloudflare account this request is about. Absent means "the default one".
+  const workspace = getWorkspaceId();
+  if (workspace) headers[WORKSPACE_HEADER] = workspace;
   if (body !== undefined) headers['Content-Type'] = 'application/json';
 
   let res: Response;
@@ -154,6 +162,13 @@ export const api = {
   },
   events: {
     list: () => get<ActivityEvent[]>('/events'),
+  },
+  workspaces: {
+    list: () => get<Workspace[]>('/workspaces'),
+    current: () => get<Workspace>('/workspaces/current'),
+    create: (b: CreateWorkspaceInput) => post<Workspace>('/workspaces', b),
+    rename: (id: string, b: UpdateWorkspaceInput) => patch<Workspace>(`/workspaces/${id}`, b),
+    remove: (id: string) => del<{ ok: true }>(`/workspaces/${id}`),
   },
   license: {
     get: () => get<LicenseStatus>('/license'),

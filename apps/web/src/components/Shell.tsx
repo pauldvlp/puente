@@ -12,7 +12,9 @@ import {
 import { PuenteMark } from './PuenteMark';
 import { useAuth } from '../lib/auth';
 import { useLive } from '../lib/live';
-import { useNodes, useRoutes } from '../lib/hooks';
+import { useNodes, useRoutes, useSwitchWorkspace, useWorkspaces } from '../lib/hooks';
+import { getWorkspaceId } from '../lib/workspace';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { ThemeToggle } from './theme';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
@@ -39,6 +41,8 @@ export function Shell() {
   const { connected } = useLive();
   const nodes = useNodes();
   const routes = useRoutes();
+  const workspaces = useWorkspaces();
+  const switchTo = useSwitchWorkspace();
   const location = useLocation();
   const title = SECTION_TITLES[location.pathname] ?? 'puente';
 
@@ -60,6 +64,28 @@ export function Shell() {
             </span>
             <span className="text-[1.05rem] font-bold tracking-tight">puente</span>
           </div>
+
+          {/* Only worth screen space once there is something to switch between: a single-workspace
+              install — which is every Community one — never sees this. */}
+          {(workspaces.data?.length ?? 0) > 1 && (
+            <div className="px-2 pb-3">
+              <Select
+                value={getWorkspaceId() ?? workspaces.data?.find((w) => w.isDefault)?.id ?? ''}
+                onValueChange={switchTo}
+              >
+                <SelectTrigger className="w-full" aria-label="Workspace">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {workspaces.data?.map((ws) => (
+                    <SelectItem key={ws.id} value={ws.id}>
+                      {ws.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <p className="px-3 pb-1.5 pt-2 text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground/70">
             Overview

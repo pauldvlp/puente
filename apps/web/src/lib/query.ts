@@ -22,4 +22,5 @@ export const qk = {
   sshHosts: ['ssh-hosts'] as const,
   license: ['license'] as const,
   alertChannels: ['alert-channels'] as const,
+  workspaces: ['workspaces'] as const,
 };
