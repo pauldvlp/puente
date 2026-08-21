@@ -29,6 +29,7 @@ import {
   type SshKey,
   type SshTestResult,
   type UpdateRouteInput,
+  type EventQueryInput,
   type UpdateSettingsInput,
   type UpdateWorkspaceInput,
   type Workspace,
@@ -164,7 +165,24 @@ export const api = {
     check: (id: string) => post<RouteCheckResult>(`/routes/${id}/check`),
   },
   events: {
-    list: () => get<ActivityEvent[]>('/events'),
+    list: (q: EventQueryInput = {}) => {
+      const params = new URLSearchParams();
+      for (const [k, v] of Object.entries(q)) {
+        if (v !== undefined && v !== '') params.set(k, String(v));
+      }
+      const qs = params.toString();
+      return get<ActivityEvent[]>(`/events${qs ? `?${qs}` : ''}`);
+    },
+  },
+  audit: {
+    /** Returns the file as a blob; the caller hands it to the browser as a download. */
+    exportUrl: (q: EventQueryInput, format: 'csv' | 'json') => {
+      const params = new URLSearchParams({ format });
+      for (const [k, v] of Object.entries(q)) {
+        if (v !== undefined && v !== '') params.set(k, String(v));
+      }
+      return `${API_PREFIX}/audit/export?${params.toString()}`;
+    },
   },
   team: {
     list: () => get<TeamMember[]>('/team'),

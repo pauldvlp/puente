@@ -164,3 +164,21 @@ export function migrateToRoles(sqlite: Database.Database): boolean {
   sqlite.exec(`ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'owner'`);
   return true;
 }
+
+/**
+ * Records who caused each activity entry.
+ *
+ * Rows written before this stay blank rather than being attributed to anyone: an audit log that
+ * invents an actor is worse than one that admits it does not know.
+ */
+export function migrateToAuditActor(sqlite: Database.Database): string[] {
+  if (!tableExists(sqlite, 'events')) return [];
+  const added: string[] = [];
+  for (const column of ['user_id', 'username']) {
+    if (!columnExists(sqlite, 'events', column)) {
+      sqlite.exec(`ALTER TABLE events ADD COLUMN ${column} TEXT`);
+      added.push(column);
+    }
+  }
+  return added;
+}

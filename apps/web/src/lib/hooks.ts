@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type {
   ActivateLicenseInput,
+  EventQueryInput,
   CreateTeamMemberInput,
   UpdateTeamMemberInput,
   CreateAlertChannelInput,
@@ -40,8 +41,12 @@ export const useCloudflareConnection = () =>
 
 export const useSettings = () => useQuery({ queryKey: qk.settings, queryFn: api.settings.get });
 
-export const useEvents = () =>
-  useQuery({ queryKey: qk.events, queryFn: api.events.list, refetchInterval: 20000 });
+export const useEvents = (filters: EventQueryInput = {}) =>
+  useQuery({
+    queryKey: [...qk.events, filters],
+    queryFn: () => api.events.list(filters),
+    refetchInterval: 20000,
+  });
 
 /** Current edition. Cached hard: a license changes when someone pastes a key, not on its own. */
 export const useLicense = () =>

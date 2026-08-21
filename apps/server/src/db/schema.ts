@@ -97,6 +97,9 @@ export const routes = sqliteTable('routes', {
 export const events = sqliteTable('events', {
   id: text('id').primaryKey(),
   ts: integer('ts').notNull(),
+  /** Who did it. Null for anything the panel did on its own — a poll tick, a startup task. */
+  userId: text('user_id'),
+  username: text('username'),
   level: text('level').notNull(),
   action: text('action').notNull(),
   message: text('message').notNull(),
