@@ -65,6 +65,11 @@ export function routeStatusMeta(s: RouteStatus): StatusMeta {
       return { label: 'Error', tone: 'danger' };
     case 'disabled':
       return { label: 'Disabled', tone: 'neutral' };
+    // Exhaustive over the union, but the union is not what arrives: this reads a value out of
+    // the user's own database. Without this branch an unrecognised status returned undefined and
+    // took the whole panel down with a blank screen.
+    default:
+      return { label: 'Unknown', tone: 'neutral' };
   }
 }
 
