@@ -18,7 +18,8 @@ export class AppSettingsController {
     return {
       cloudflare: this.cloudflare.getConnection(),
       dataDir: DATA_DIR,
-      defaultZoneId: row.defaultZoneId,
+      // Per workspace now, unlike the poll interval, which is app-wide.
+      defaultZoneId: this.settings.getDefaultZoneId(),
       healthPollSeconds: row.healthPollSeconds,
     };
   }

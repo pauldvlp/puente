@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { CloudflareService } from './cloudflare.service';
 import type { SettingsService } from '../settings/settings.service';
+import type { WorkspacesService } from '../workspaces/workspaces.service';
 
 /**
  * The SDK is doubled at the `client()` seam, so these assert the wrapper's contract
@@ -10,7 +11,10 @@ import type { SettingsService } from '../settings/settings.service';
 function withFakeSdk() {
   const update = vi.fn().mockResolvedValue({});
   const cf = { zeroTrust: { tunnels: { cloudflared: { configurations: { update } } } } };
-  const svc = new CloudflareService({} as unknown as SettingsService);
+  const svc = new CloudflareService(
+    {} as unknown as SettingsService,
+    {} as unknown as WorkspacesService,
+  );
   vi.spyOn(svc as unknown as { client: () => unknown }, 'client').mockReturnValue({
     cf,
     accountId: 'acct_1',

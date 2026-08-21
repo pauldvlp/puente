@@ -2,6 +2,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { DbService } from '../../db/db.service';
 import { CryptoService } from '../../common/crypto.service';
 import { SettingsService } from '../settings/settings.service';
+import { WorkspacesService } from '../workspaces/workspaces.service';
 import { CloudflareService } from './cloudflare.service';
 
 /**
@@ -22,7 +23,11 @@ const RUN = process.env.GITHUB_RUN_ID ?? String(Date.now());
 
 describe.skipIf(!TOKEN)('Cloudflare, live', () => {
   const dbs = new DbService();
-  const cf = new CloudflareService(new SettingsService(dbs, new CryptoService()));
+  const workspaces = new WorkspacesService(dbs);
+  const cf = new CloudflareService(
+    new SettingsService(dbs, new CryptoService(), workspaces),
+    workspaces,
+  );
 
   const hostname = `e2e-${RUN}.${ZONE}`;
   let zoneId = '';

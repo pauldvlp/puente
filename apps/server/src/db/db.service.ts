@@ -1,8 +1,9 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, Logger } from '@nestjs/common';
 import Database from 'better-sqlite3';
 import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { DB_PATH, ensureDataDir } from '../config/paths';
 import * as schema from './schema';
+import { migrateToWorkspaces } from './migrations';
 
 /**
  * Idempotent DDL. We ship an embedded schema bootstrap (CREATE TABLE IF NOT
@@ -35,11 +36,13 @@ CREATE TABLE IF NOT EXISTS zones (
   name TEXT NOT NULL,
   status TEXT,
   account_id TEXT,
+  workspace_id TEXT,
   updated_at INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS nodes (
   id TEXT PRIMARY KEY,
+  workspace_id TEXT,
   name TEXT NOT NULL,
   kind TEXT NOT NULL,
   ssh_host TEXT,
@@ -68,6 +71,7 @@ CREATE TABLE IF NOT EXISTS nodes (
 
 CREATE TABLE IF NOT EXISTS routes (
   id TEXT PRIMARY KEY,
+  workspace_id TEXT,
   node_id TEXT NOT NULL,
   hostname TEXT NOT NULL,
   subdomain TEXT NOT NULL,
@@ -119,12 +123,26 @@ CREATE TABLE IF NOT EXISTS alert_channels (
   updated_at INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS workspaces (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  cloudflare_auth_mode TEXT,
+  cloudflare_api_token_enc TEXT,
+  cloudflare_account_id TEXT,
+  cloudflare_account_name TEXT,
+  default_zone_id TEXT,
+  is_default INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_routes_node ON routes(node_id);
 CREATE INDEX IF NOT EXISTS idx_events_ts ON events(ts);
 `;
 
 @Injectable()
 export class DbService implements OnModuleDestroy {
+  private readonly logger = new Logger(DbService.name);
   readonly sqlite: Database.Database;
   readonly db: BetterSQLite3Database<typeof schema>;
 
@@ -135,6 +153,14 @@ export class DbService implements OnModuleDestroy {
     this.sqlite.pragma('foreign_keys = ON');
     this.sqlite.pragma('busy_timeout = 5000');
     this.sqlite.exec(BOOTSTRAP_SQL);
+    // Runs on every boot and is a no-op once applied; see migrations.ts.
+    const report = migrateToWorkspaces(this.sqlite, Date.now());
+    if (report.workspaceCreated || report.rowsAssigned > 0) {
+      this.logger.log(
+        `Workspaces ready${report.connectionMoved ? ' (Cloudflare connection moved into it)' : ''}` +
+          `${report.rowsAssigned ? `, ${report.rowsAssigned} row(s) adopted` : ''}.`,
+      );
+    }
     this.db = drizzle(this.sqlite, { schema });
   }
 

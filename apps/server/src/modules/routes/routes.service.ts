@@ -14,6 +14,7 @@ import { EventBus } from '../../common/event-bus.service';
 import { EventsService } from '../events/events.service';
 import { CloudflareService, type IngressRule } from '../cloudflare/cloudflare.service';
 import { SettingsService } from '../settings/settings.service';
+import { WorkspacesService } from '../workspaces/workspaces.service';
 import { nodes, routes, type NodeRow, type RouteRow } from '../../db/schema';
 import { newId } from '../../common/ids';
 import { nowMs, toIso, toIsoStrict } from '../../common/time';
@@ -28,6 +29,7 @@ export class RoutesService {
     private readonly settings: SettingsService,
     private readonly events: EventsService,
     private readonly bus: EventBus,
+    private readonly workspaces: WorkspacesService,
   ) {}
 
   private get db() {
@@ -38,6 +40,7 @@ export class RoutesService {
     return this.db
       .select()
       .from(routes)
+      .where(eq(routes.workspaceId, this.workspaces.currentId()))
       .all()
       .map((r) => this.toDto(r));
   }
@@ -100,6 +103,7 @@ export class RoutesService {
     const now = nowMs();
     const row: RouteRow = {
       id: newId('route'),
+      workspaceId: this.workspaces.currentId(),
       nodeId: dto.nodeId,
       hostname,
       subdomain: dto.subdomain,

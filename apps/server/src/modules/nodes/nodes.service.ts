@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type {
   CreateNodeInput,
   Node,
@@ -16,6 +16,7 @@ import { SshService } from '../ssh/ssh.service';
 import { CloudflaredService, type Target } from '../cloudflared/cloudflared.service';
 import { CloudflareService } from '../cloudflare/cloudflare.service';
 import { SettingsService } from '../settings/settings.service';
+import { WorkspacesService } from '../workspaces/workspaces.service';
 import { RoutesService } from '../routes/routes.service';
 import { nodes, type NodeRow } from '../../db/schema';
 import { newId } from '../../common/ids';
@@ -36,6 +37,7 @@ export class NodesService {
     private readonly cloudflared: CloudflaredService,
     private readonly cloudflare: CloudflareService,
     private readonly settings: SettingsService,
+    private readonly workspaces: WorkspacesService,
     private readonly routes: RoutesService,
   ) {}
 
@@ -44,7 +46,12 @@ export class NodesService {
   }
 
   list(): Node[] {
-    return this.db.select().from(nodes).all().map(toNodeDto);
+    return this.db
+      .select()
+      .from(nodes)
+      .where(eq(nodes.workspaceId, this.workspaces.currentId()))
+      .all()
+      .map(toNodeDto);
   }
 
   getRow(id: string): NodeRow {
@@ -61,6 +68,7 @@ export class NodesService {
     const now = nowMs();
     const base = {
       id: newId('node'),
+      workspaceId: this.workspaces.currentId(),
       name: dto.name,
       provisionState: 'unprovisioned' as const,
       connectorRunState: 'unknown' as const,
@@ -71,7 +79,13 @@ export class NodesService {
 
     if (dto.kind === 'local') {
       // Only one local node makes sense (the control-plane host).
-      const existingLocal = this.db.select().from(nodes).where(eq(nodes.kind, 'local')).get();
+      // One local node per workspace: it is the control-plane host, and each workspace
+      // publishes it through its own Cloudflare account.
+      const existingLocal = this.db
+        .select()
+        .from(nodes)
+        .where(and(eq(nodes.kind, 'local'), eq(nodes.workspaceId, this.workspaces.currentId())))
+        .get();
       if (existingLocal) {
         throw new BadRequestException({
           statusCode: 400,

@@ -12,6 +12,7 @@ import type {
   TunnelStatus,
 } from '@puente/shared';
 import { SettingsService } from '../settings/settings.service';
+import { WorkspacesService } from '../workspaces/workspaces.service';
 
 export interface IngressRule {
   hostname?: string;
@@ -36,7 +37,10 @@ export interface TunnelInfo {
 export class CloudflareService {
   private readonly logger = new Logger(CloudflareService.name);
 
-  constructor(private readonly settings: SettingsService) {}
+  constructor(
+    private readonly settings: SettingsService,
+    private readonly workspaces: WorkspacesService,
+  ) {}
 
   private clientFor(token: string): Cloudflare {
     return new Cloudflare({ apiToken: token });
@@ -156,16 +160,19 @@ export class CloudflareService {
     };
   }
 
-  /** Current connection state assembled from cached settings (no live call). */
+  /** Current connection state, cached on the workspace (no live call). */
   getConnection(): CloudflareConnection {
-    const row = this.settings.get();
+    const ws = this.workspaces.current();
     const connected = this.settings.isCloudflareConnected();
-    const account: CloudflareAccount | null = row.cloudflareAccountId
-      ? { id: row.cloudflareAccountId, name: row.cloudflareAccountName ?? row.cloudflareAccountId }
+    const account: CloudflareAccount | null = ws.cloudflareAccountId
+      ? {
+          id: ws.cloudflareAccountId,
+          name: ws.cloudflareAccountName ?? ws.cloudflareAccountId,
+        }
       : null;
     return {
       connected,
-      authMode: (row.cloudflareAuthMode as CloudflareConnection['authMode']) ?? null,
+      authMode: (ws.cloudflareAuthMode as CloudflareConnection['authMode']) ?? null,
       tokenStatus: connected ? 'active' : null,
       account,
       accounts: account ? [account] : [],
