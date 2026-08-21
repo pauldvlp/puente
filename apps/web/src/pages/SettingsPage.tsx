@@ -31,6 +31,7 @@ import {
 import { ConnectCloudflare } from '../components/ConnectCloudflare';
 import { LicenseCard } from '../ee/LicenseCard';
 import { AlertsCard } from '../ee/AlertsCard';
+import { BackupsCard } from '../ee/BackupsCard';
 import { WorkspacesCard } from '../components/WorkspacesCard';
 import { TeamCard } from '../components/TeamCard';
 
@@ -123,6 +124,8 @@ export function SettingsPage() {
       <LicenseCard />
 
       <AlertsCard />
+
+      <BackupsCard />
 
       {/* Preferences */}
       <Card className="mb-6 gap-0 py-0">

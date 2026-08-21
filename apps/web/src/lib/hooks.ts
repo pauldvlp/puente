@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import type {
   ActivateLicenseInput,
   EventQueryInput,
+  UpdateBackupScheduleInput,
   CreateTeamMemberInput,
   UpdateTeamMemberInput,
   CreateAlertChannelInput,
@@ -51,6 +52,46 @@ export const useEvents = (filters: EventQueryInput = {}) =>
 /** Current edition. Cached hard: a license changes when someone pastes a key, not on its own. */
 export const useLicense = () =>
   useQuery({ queryKey: qk.license, queryFn: api.license.get, staleTime: 60_000 });
+
+export const useBackupSchedule = (enabled: boolean) =>
+  useQuery({ queryKey: qk.backupSchedule, queryFn: api.backups.schedule, enabled });
+
+export const useBackupFiles = (enabled: boolean) =>
+  useQuery({ queryKey: qk.backupFiles, queryFn: api.backups.files, enabled });
+
+export function useBackupMutations() {
+  const qc = useQueryClient();
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: qk.backupSchedule });
+    qc.invalidateQueries({ queryKey: qk.backupFiles });
+  };
+
+  const update = useMutation({
+    mutationFn: (b: UpdateBackupScheduleInput) => api.backups.update(b),
+    onSuccess: invalidate,
+    onError: notifyError,
+  });
+
+  const run = useMutation({
+    mutationFn: () => api.backups.run(),
+    onSuccess: (file) => {
+      invalidate();
+      toast.success(`Backup written — ${file.name}`);
+    },
+    onError: notifyError,
+  });
+
+  const remove = useMutation({
+    mutationFn: (name: string) => api.backups.remove(name),
+    onSuccess: () => {
+      invalidate();
+      toast.success('Backup deleted');
+    },
+    onError: notifyError,
+  });
+
+  return { update, run, remove };
+}
 
 export const useTeam = () => useQuery({ queryKey: qk.team, queryFn: api.team.list });
 

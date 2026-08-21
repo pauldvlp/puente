@@ -14,6 +14,8 @@ export const JWT_SECRET_PATH = join(DATA_DIR, 'jwt.secret');
 export const KEYS_DIR = join(DATA_DIR, 'keys');
 /** Downloaded cloudflared binary for the local node (when not on PATH). */
 export const BIN_DIR = join(DATA_DIR, 'bin');
+/** Default home for scheduled backups. Overridable per install. */
+export const BACKUPS_DIR = join(DATA_DIR, 'backups');
 /** Where a running panel records its pid, port and URL so other CLI calls can find it. */
 export const DAEMON_STATE_PATH = join(DATA_DIR, 'daemon.json');
 /** stdout + stderr of the panel when it runs in the background. */
