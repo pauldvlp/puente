@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>puente — Cloudflare runs the edge. puente runs your machines.</title>
+    <meta
+      name="description"
+      content="A self-hosted panel that installs, starts and watches cloudflared on every machine you own — locally and over SSH. Free and open source under the AGPL."
+    />
+    <meta name="theme-color" content="#716BD3" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="puente — a self-hosted Cloudflare Tunnel fleet manager" />
+    <meta
+      property="og:description"
+      content="The Cloudflare dashboard creates tunnels. It does not install, start, upgrade or watch cloudflared on the twelve boxes you actually own. puente does."
+    />
+    <meta
+      property="og:image"
+      content="https://raw.githubusercontent.com/pauldvlp/puente/main/apps/web/public/og.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link
+      rel="icon"
+      href="https://raw.githubusercontent.com/pauldvlp/puente/main/apps/web/public/favicon.svg"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    />
+
+    <style>
+      /* Palette lifted from the panel's own tokens (apps/web/src/index.css) so the site and the
+         product read as one thing. Violet-biased neutrals; Cloudflare orange only for the edge. */
+      :root {
+        --ground: oklch(0.968 0.014 292);
+        --surface: oklch(1 0 0);
+        --surface-2: oklch(0.985 0.008 292);
+        --ink: oklch(0.24 0.02 285);
+        --ink-soft: oklch(0.48 0.026 285);
+        --ink-faint: oklch(0.62 0.022 288);
+        --line: oklch(0.9 0.018 290);
+        --line-strong: oklch(0.84 0.026 290);
+        --brand: oklch(0.585 0.155 283);
+        --brand-soft: oklch(0.585 0.155 283 / 0.1);
+        --brand-ink: oklch(0.99 0.005 285);
+        --cf: oklch(0.62 0.16 52);
+        --ok: oklch(0.55 0.13 152);
+        --shadow: 0 24px 60px -34px oklch(0.4 0.12 285 / 0.55);
+        --shadow-lift: 0 32px 70px -30px oklch(0.4 0.14 285 / 0.6);
+
+        --step--1: clamp(0.79rem, 0.77rem + 0.1vw, 0.85rem);
+        --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.09rem);
+        --step-1: clamp(1.2rem, 1.12rem + 0.4vw, 1.42rem);
+        --step-2: clamp(1.5rem, 1.34rem + 0.8vw, 2rem);
+        --step-3: clamp(1.95rem, 1.6rem + 1.7vw, 2.9rem);
+        --step-4: clamp(2.5rem, 1.85rem + 3.2vw, 4.4rem);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --ground: oklch(0.185 0.028 285);
+          --surface: oklch(0.235 0.03 286);
+          --surface-2: oklch(0.215 0.028 286);
+          --ink: oklch(0.95 0.01 290);
+          --ink-soft: oklch(0.78 0.022 288);
+          --ink-faint: oklch(0.66 0.024 288);
+          --line: oklch(0.33 0.03 288);
+          --line-strong: oklch(0.42 0.036 288);
+          --brand: oklch(0.75 0.145 285);
+          --brand-soft: oklch(0.75 0.145 285 / 0.14);
+          --brand-ink: oklch(0.18 0.03 285);
+          --cf: oklch(0.75 0.16 55);
+          --ok: oklch(0.72 0.14 152);
+          --shadow: 0 24px 60px -34px oklch(0.08 0.04 285 / 0.9);
+          --shadow-lift: 0 32px 70px -28px oklch(0.06 0.04 285 / 0.95);
+        }
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--ground);
+        color: var(--ink);
+        font-family:
+          'Public Sans',
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        font-size: var(--step-0);
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-family: 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif;
+        text-wrap: balance;
+        letter-spacing: -0.022em;
+        line-height: 1.06;
+        margin: 0;
+      }
+
+      .mono {
+        font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+        font-variant-ligatures: none;
+      }
+
+      a {
+        color: inherit;
+      }
+      :focus-visible {
+        outline: 2px solid var(--brand);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+
+      .wrap {
+        width: min(100% - 2.5rem, 1120px);
+        margin-inline: auto;
+      }
+
+      .eyebrow {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        margin: 0;
+      }
+
+      header.bar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(14px);
+        background: color-mix(in oklab, var(--ground) 82%, transparent);
+        border-bottom: 1px solid var(--line);
+      }
+      .bar-inner {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding-block: 0.85rem;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        font-family: 'Familjen Grotesk', sans-serif;
+        letter-spacing: -0.02em;
+      }
+      .logo svg {
+        width: 26px;
+        height: 26px;
+        color: var(--brand);
+      }
+      .bar nav {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 1.4rem;
+        font-size: var(--step--1);
+      }
+      /* :not(.btn) matters — without it this outranks .btn-primary and paints the call to
+         action in muted ink on its own brand background. */
+      .bar nav a:not(.btn) {
+        color: var(--ink-soft);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .bar nav a:not(.btn):hover {
+        color: var(--ink);
+      }
+      .bar nav a.btn {
+        text-decoration: none;
+      }
+      @media (max-width: 700px) {
+        .bar nav a.hide-sm {
+          display: none;
+        }
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.62rem 1.1rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-weight: 600;
+        font-size: var(--step--1);
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          transform 120ms ease,
+          background-color 120ms ease,
+          border-color 120ms ease;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+      .btn-primary {
+        background: var(--brand);
+        color: var(--brand-ink);
+      }
+      .btn-ghost {
+        border-color: var(--line-strong);
+        color: var(--ink);
+      }
+      .btn-ghost:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+      }
+
+      .hero {
+        padding-block: clamp(3.5rem, 7vw, 6.5rem) clamp(2rem, 4vw, 3rem);
+      }
+      .hero h1 {
+        font-size: var(--step-4);
+        font-weight: 700;
+        margin-block: 1rem 0;
+        max-width: 18ch;
+      }
+      .hero h1 .edge {
+        color: var(--cf);
+      }
+      .hero h1 .yours {
+        color: var(--brand);
+      }
+      .hero p.lede {
+        font-size: var(--step-1);
+        color: var(--ink-soft);
+        max-width: 56ch;
+        margin: 1.25rem 0 0;
+        line-height: 1.45;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+        margin-top: 2rem;
+      }
+      .cmd {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.6rem 1.1rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: var(--step--1);
+        box-shadow: var(--shadow);
+      }
+      .cmd .prompt {
+        color: var(--brand);
+        font-weight: 700;
+      }
+      .hero .meta {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        font-size: var(--step--1);
+        color: var(--ink-faint);
+      }
+      .hero .meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--ok);
+      }
+
+      .shot {
+        margin-top: clamp(2.5rem, 5vw, 4rem);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-lift);
+        background: var(--surface);
+        line-height: 0;
+      }
+      .shot img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .shot figcaption {
+        line-height: 1.5;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        padding: 0.85rem 1.2rem;
+        border-top: 1px solid var(--line);
+      }
+
+      section {
+        padding-block: clamp(3rem, 6vw, 5.5rem);
+      }
+      .section-head {
+        max-width: 62ch;
+      }
+      .section-head h2 {
+        font-size: var(--step-3);
+        font-weight: 700;
+        margin-top: 0.75rem;
+      }
+      .section-head p {
+        color: var(--ink-soft);
+        margin-top: 1rem;
+        font-size: var(--step-1);
+        line-height: 1.5;
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--line);
+        border: 0;
+        margin: 0;
+      }
+
+      .gap-table {
+        margin-top: 2.5rem;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        overflow: hidden;
+        background: var(--surface);
+      }
+      .gap-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) 8rem 8rem;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.95rem 1.3rem;
+        border-top: 1px solid var(--line);
+      }
+      .gap-row:first-child {
+        border-top: 0;
+      }
+      .gap-head {
+        background: var(--surface-2);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+      .gap-row .who {
+        text-align: center;
+        font-weight: 600;
+        font-size: var(--step--1);
+      }
+      .yes {
+        color: var(--ok);
+      }
+      .no {
+        color: var(--ink-faint);
+      }
+      .brandtext {
+        color: var(--brand);
+      }
+      @media (max-width: 700px) {
+        .gap-row {
+          grid-template-columns: minmax(0, 1fr) 4.5rem 4.5rem;
+          padding-inline: 0.9rem;
+          gap: 0.5rem;
+        }
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+        margin-top: 2.75rem;
+      }
+      @media (max-width: 860px) {
+        .steps {
+          grid-template-columns: 1fr;
+        }
+      }
+      .step {
+        padding-left: 1.4rem;
+        border-left: 2px solid var(--brand-soft);
+      }
+      .step .n {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--brand);
+        letter-spacing: 0.1em;
+      }
+      .step h3 {
+        font-size: var(--step-1);
+        font-weight: 600;
+        margin-top: 0.5rem;
+      }
+      .step p {
+        color: var(--ink-soft);
+        font-size: var(--step--1);
+        margin-top: 0.5rem;
+        line-height: 1.6;
+      }
+
+      .tiers {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: 2.75rem;
+        align-items: start;
+      }
+      @media (max-width: 1000px) {
+        .tiers {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 560px) {
+        .tiers {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .tier {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 1.5rem 1.35rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        height: 100%;
+      }
+      .tier.featured {
+        border-color: var(--brand);
+        box-shadow: var(--shadow-lift);
+        position: relative;
+      }
+      .tier.featured::after {
+        content: 'Most agencies land here';
+        position: absolute;
+        top: -0.72rem;
+        left: 1.2rem;
+        background: var(--brand);
+        color: var(--brand-ink);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+      }
+      .tier .name {
+        font-family: 'Familjen Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: var(--step-1);
+      }
+      .tier .price {
+        font-family: 'Familjen Grotesk', sans-serif;
+        font-size: var(--step-2);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+      }
+      .tier .price small {
+        font-size: var(--step--1);
+        font-weight: 500;
+        color: var(--ink-faint);
+        font-family: 'Public Sans', sans-serif;
+        letter-spacing: 0;
+      }
+      .tier .who-for {
+        font-size: var(--step--1);
+        color: var(--ink-soft);
+        min-height: 3.2em;
+      }
+      .tier ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-size: var(--step--1);
+      }
+      .tier li {
+        display: grid;
+        grid-template-columns: 1rem 1fr;
+        gap: 0.55rem;
+        align-items: start;
+        color: var(--ink-soft);
+      }
+      .tier li b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .tick {
+        color: var(--brand);
+        font-weight: 700;
+        line-height: 1.5;
+      }
+      .tier .btn {
+        margin-top: auto;
+        width: 100%;
+      }
+
+      .founding {
+        margin-top: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem 1.25rem;
+        border: 1px dashed var(--line-strong);
+        border-radius: 14px;
+        padding: 1rem 1.25rem;
+        font-size: var(--step--1);
+        color: var(--ink-soft);
+      }
+      .founding b {
+        color: var(--ink);
+      }
+
+      .faq {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.75rem 3rem;
+        margin-top: 2.5rem;
+      }
+      @media (max-width: 800px) {
+        .faq {
+          grid-template-columns: 1fr;
+        }
+      }
+      .faq h3 {
+        font-size: var(--step-0);
+        font-weight: 600;
+        font-family: 'Familjen Grotesk', sans-serif;
+      }
+      .faq p {
+        color: var(--ink-soft);
+        font-size: var(--step--1);
+        margin-top: 0.45rem;
+        line-height: 1.6;
+      }
+
+      .closing {
+        text-align: center;
+        padding-block: clamp(3.5rem, 7vw, 6rem);
+        border-top: 1px solid var(--line);
+      }
+      .closing h2 {
+        font-size: var(--step-3);
+        font-weight: 700;
+      }
+      .closing p {
+        color: var(--ink-soft);
+        max-width: 48ch;
+        margin: 1rem auto 0;
+      }
+      .closing .cta-row {
+        justify-content: center;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding-block: 2rem 3rem;
+        font-size: var(--step--1);
+        color: var(--ink-faint);
+      }
+      .foot-inner {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem 2rem;
+        align-items: center;
+      }
+      footer a {
+        color: var(--ink-soft);
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: var(--brand);
+      }
+      .foot-links {
+        margin-left: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="bar">
+      <div class="wrap bar-inner">
+        <span class="logo">
+          <svg viewBox="-8 -8 144 144" fill="none" aria-hidden="true">
+            <path
+              d="M93.2137 46.9903C93.2532 46.9902 93.2932 46.9901 93.3332 46.9901C106.588 46.9901 117.333 57.3963 117.333 70.2325C117.333 82.1963 108 92.0485 95.9998 93.3333M93.2137 46.9903C93.2926 46.1397 93.3332 45.2782 93.3332 44.4076C93.3332 28.7185 80.2004 16 63.9998 16C48.6571 16 36.0656 27.4075 34.7754 41.9423M93.2137 46.9903C92.6681 52.8498 90.2857 58.1963 86.6281 62.4853M34.7754 41.9423C21.2477 43.189 10.6665 54.2229 10.6665 67.6501C10.6665 80.144 19.8279 90.9408 31.9998 93.3333M34.7754 41.9423C35.6172 41.8647 36.4704 41.8251 37.3332 41.8251C43.3375 41.8251 48.8785 43.7469 53.3358 46.9901"
+              stroke="currentColor"
+              stroke-width="9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M63.9998 80V112M77.3332 88L50.6672 104M50.6665 88L77.3326 104"
+              stroke="currentColor"
+              stroke-width="9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          puente
+        </span>
+        <nav>
+          <a href="#gap" class="hide-sm">Why</a>
+          <a href="#how" class="hide-sm">How it works</a>
+          <a href="#pricing">Pricing</a>
+          <a href="https://github.com/pauldvlp/puente">GitHub</a>
+          <a class="btn btn-primary" href="#pricing">Get Pro</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <p class="eyebrow">Open source · AGPL-3.0 · self-hosted</p>
+          <h1>
+            Cloudflare runs <span class="edge">the edge</span>.<br />puente runs
+            <span class="yours">your machines</span>.
+          </h1>
+          <p class="lede">
+            The dashboard creates tunnels. It does not install, start, upgrade or watch
+            <code class="mono">cloudflared</code> on the twelve boxes you actually own. puente does
+            — locally and over SSH, from one panel.
+          </p>
+
+          <div class="cta-row">
+            <span class="cmd"><span class="prompt">$</span> npx puente</span>
+            <a class="btn btn-ghost" href="#pricing">See pricing</a>
+          </div>
+
+          <div class="meta">
+            <span><i class="dot"></i> Unlimited nodes, free forever</span>
+            <span><i class="dot"></i> No telemetry, ever</span>
+          </div>
+
+          <figure class="shot">
+            <img
+              src="assets/demo.gif"
+              alt="The puente panel: three machines, four public hostnames, live health, workspaces and licensing"
+              width="1280"
+              height="800"
+              loading="lazy"
+            />
+            <figcaption>the actual panel — three machines, four public hostnames</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <section id="gap">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="eyebrow">The gap</p>
+            <h2>Cloudflare moved tunnel management into the main dashboard. It stopped there.</h2>
+            <p>
+              Their own changelog is explicit about what the dashboard covers — creating,
+              configuring and monitoring tunnels — and what it leaves to you: connector
+              installation, connector updates, fleet management, remote deployment. That leftover
+              list is a person with an SSH window open, twelve times.
+            </p>
+          </div>
+
+          <div class="gap-table">
+            <div class="gap-row gap-head">
+              <span>Job to be done</span>
+              <span class="who">Cloudflare</span>
+              <span class="who">puente</span>
+            </div>
+            <div class="gap-row">
+              <span>Create a tunnel, point DNS at it</span>
+              <span class="who yes">Yes</span>
+              <span class="who yes">Yes</span>
+            </div>
+            <div class="gap-row">
+              <span>Install <code class="mono">cloudflared</code> on a machine you own</span>
+              <span class="who no">You do it</span>
+              <span class="who brandtext">One click</span>
+            </div>
+            <div class="gap-row">
+              <span>Register it as a service, keep it running after reboot</span>
+              <span class="who no">You do it</span>
+              <span class="who brandtext">One click</span>
+            </div>
+            <div class="gap-row">
+              <span>Do that on a remote server, over SSH</span>
+              <span class="who no">You do it</span>
+              <span class="who brandtext">Built in</span>
+            </div>
+            <div class="gap-row">
+              <span>Get told when a tunnel goes down</span>
+              <span class="who no">You watch it</span>
+              <span class="who brandtext">Alerts</span>
+            </div>
+            <div class="gap-row">
+              <span>Several client accounts, side by side</span>
+              <span class="who no">Partner agreement</span>
+              <span class="who brandtext">Workspaces</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <section id="how">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="eyebrow">Three steps, about two minutes</p>
+            <h2>Port to public hostname, without touching a config file.</h2>
+          </div>
+
+          <div class="steps">
+            <article class="step">
+              <span class="n">STEP 01</span>
+              <h3>Connect Cloudflare</h3>
+              <p>
+                Paste an API token — the setup screen lists the exact scopes, so you never
+                over-grant. Tokens are encrypted at rest with AES-256-GCM.
+              </p>
+            </article>
+            <article class="step">
+              <span class="n">STEP 02</span>
+              <h3>Add your machines</h3>
+              <p>
+                This one, or any host you can reach over SSH. puente bootstraps passwordless access,
+                installs the connector and registers the service.
+              </p>
+            </article>
+            <article class="step">
+              <span class="n">STEP 03</span>
+              <h3>Publish a port</h3>
+              <p>
+                <code class="mono">7008 → vw.example.com</code>. Ingress rules and DNS records are
+                written for you, and health is live from then on.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <section id="pricing">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="eyebrow">Editions</p>
+            <h2>The free edition is the whole product. Pro is what a team needs around it.</h2>
+            <p>
+              No node cap, no route cap, no trial clock in Community — capping the thing puente
+              exists to do would be a strange way to sell it. Pro keys are verified offline; the
+              panel never phones home.
+            </p>
+          </div>
+
+          <div class="tiers">
+            <article class="tier">
+              <span class="name">Community</span>
+              <span class="price">$0<small> / forever</small></span>
+              <p class="who-for">One admin, one Cloudflare account. Homelabs and solo operators.</p>
+              <ul>
+                <li>
+                  <span class="tick">✓</span><span>Unlimited <b>nodes and routes</b></span>
+                </li>
+                <li>
+                  <span class="tick">✓</span><span>Local <b>and SSH</b> orchestration</span>
+                </li>
+                <li><span class="tick">✓</span><span>Live status, activity feed, CLI</span></li>
+                <li><span class="tick">✓</span><span>AGPL-3.0 source, no telemetry</span></li>
+              </ul>
+              <a class="btn btn-ghost" href="https://github.com/pauldvlp/puente">Install it</a>
+            </article>
+
+            <article class="tier">
+              <span class="name">Pro</span>
+              <span class="price">$199<small> / year</small></span>
+              <p class="who-for">Small teams sharing one panel instead of one password.</p>
+              <ul>
+                <li><span class="tick">✓</span><span>Everything in Community</span></li>
+                <li>
+                  <span class="tick">✓</span><span><b>5 seats</b> with roles</span>
+                </li>
+                <li>
+                  <span class="tick">✓</span
+                  ><span><b>Alerts</b> to Slack, Discord or any webhook</span>
+                </li>
+                <li><span class="tick">✓</span><span>Scheduled backup &amp; restore</span></li>
+                <li><span class="tick">✓</span><span>Exportable audit log · API tokens</span></li>
+              </ul>
+              <a
+                class="btn btn-ghost"
+                href="mailto:johanpaulbarahona@gmail.com?subject=puente%20Pro"
+                >Buy Pro</a
+              >
+            </article>
+
+            <article class="tier featured">
+              <span class="name">Agency</span>
+              <span class="price">$499<small> / year</small></span>
+              <p class="who-for">
+                You run infrastructure for other people, in their Cloudflare accounts.
+              </p>
+              <ul>
+                <li><span class="tick">✓</span><span>Everything in Pro</span></li>
+                <li>
+                  <span class="tick">✓</span><span><b>15 seats</b></span>
+                </li>
+                <li>
+                  <span class="tick">✓</span
+                  ><span
+                    ><b>Client workspaces</b> — several Cloudflare accounts, fully isolated</span
+                  >
+                </li>
+                <li>
+                  <span class="tick">✓</span
+                  ><span><b>Fleet operations</b> — upgrade every connector at once</span>
+                </li>
+                <li><span class="tick">✓</span><span>Per-client activity export</span></li>
+              </ul>
+              <a
+                class="btn btn-primary"
+                href="mailto:johanpaulbarahona@gmail.com?subject=puente%20Agency"
+                >Buy Agency</a
+              >
+            </article>
+
+            <article class="tier">
+              <span class="name">Enterprise</span>
+              <span class="price">$1,499<small> / year from</small></span>
+              <p class="who-for">
+                Internal platform teams with an identity provider and an auditor.
+              </p>
+              <ul>
+                <li><span class="tick">✓</span><span>Everything in Agency</span></li>
+                <li>
+                  <span class="tick">✓</span><span><b>Unlimited seats</b></span>
+                </li>
+                <li>
+                  <span class="tick">✓</span><span><b>SSO</b> via OIDC</span>
+                </li>
+                <li><span class="tick">✓</span><span>Support with response times</span></li>
+                <li><span class="tick">✓</span><span>Invoicing, PO, your paper</span></li>
+              </ul>
+              <a
+                class="btn btn-ghost"
+                href="mailto:johanpaulbarahona@gmail.com?subject=puente%20Enterprise"
+                >Talk to us</a
+              >
+            </article>
+          </div>
+
+          <p class="founding">
+            <b>Founding licences:</b> the first 50 customers keep 40% off for as long as they renew.
+            <span
+              >Prices are per organisation, not per node. Every plan is a perpetual fallback: if you
+              stop renewing, the version you paid for keeps running.</span
+            >
+          </p>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <p class="eyebrow">Straight answers</p>
+            <h2>The questions people actually ask before installing this.</h2>
+          </div>
+
+          <div class="faq">
+            <div>
+              <h3>Is Community a crippled trial?</h3>
+              <p>
+                No. Unlimited nodes, unlimited routes, no clock. If puente never made a cent it
+                would still do the job it was built for. Pro sells team and multi-client concerns,
+                not capacity.
+              </p>
+            </div>
+            <div>
+              <h3>Does the AGPL force me to open-source anything?</h3>
+              <p>
+                Running puente — for yourself, your company, or your clients — triggers nothing. The
+                obligation only appears if you modify it and offer that modified version to other
+                people over a network.
+              </p>
+            </div>
+            <div>
+              <h3>Does it phone home?</h3>
+              <p>
+                Never, at any edition. Licence keys are signed and verified against a public key
+                compiled into the binary, so Pro works on an air-gapped network exactly as it does
+                on a laptop.
+              </p>
+            </div>
+            <div>
+              <h3>What happens when a licence expires?</h3>
+              <p>
+                Pro features go quiet after a 14-day grace period. Tunnels, routes, nodes and the
+                CLI are AGPL code that never asks about your licence — an expired invoice cannot
+                take an origin down.
+              </p>
+            </div>
+            <div>
+              <h3>Where do my Cloudflare tokens live?</h3>
+              <p>
+                On your machine, in <code class="mono">~/.puente</code>, encrypted with AES-256-GCM.
+                There is no puente cloud to leak them from.
+              </p>
+            </div>
+            <div>
+              <h3>Can I read the paid code?</h3>
+              <p>
+                Yes — it ships in the open repository under <code class="mono">ee/</code>. Software
+                holding SSH credentials should not have a closed room in it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="closing">
+        <div class="wrap">
+          <h2>Ten machines, one panel, two minutes.</h2>
+          <p>
+            Install the free edition first. If it ends up running your clients' infrastructure, you
+            know where the Buy button is.
+          </p>
+          <div class="cta-row">
+            <span class="cmd"><span class="prompt">$</span> npx puente</span>
+            <a class="btn btn-primary" href="#pricing">Compare editions</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap foot-inner">
+        <span>© 2026 Paul Barahona · AGPL-3.0 with a commercial edition</span>
+        <span class="foot-links">
+          <a href="https://github.com/pauldvlp/puente">GitHub</a>
+          <a href="https://www.npmjs.com/package/puente">npm</a>
+          <a href="https://github.com/pauldvlp/puente/blob/main/LICENSING.md">Licensing</a>
+          <a href="mailto:johanpaulbarahona@gmail.com">Contact</a>
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>
