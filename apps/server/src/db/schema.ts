@@ -162,6 +162,20 @@ export const apiTokens = sqliteTable('api_tokens', {
   expiresAt: integer('expires_at'),
 });
 
+export const ssoConfig = sqliteTable('sso_config', {
+  id: text('id').primaryKey(), // always 'current'
+  enabled: integer('enabled', { mode: 'boolean' }).notNull().default(false),
+  label: text('label').notNull().default('SSO'),
+  issuer: text('issuer').notNull().default(''),
+  clientId: text('client_id').notNull().default(''),
+  clientSecretEnc: text('client_secret_enc'),
+  allowedDomain: text('allowed_domain').notNull().default(''),
+  defaultRole: text('default_role').notNull().default('viewer'),
+  lastError: text('last_error'),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
 export type UserRow = typeof users.$inferSelect;
 export type SettingsRow = typeof settings.$inferSelect;
 export type WorkspaceRow = typeof workspaces.$inferSelect;
@@ -173,3 +187,4 @@ export type LicenseRow = typeof license.$inferSelect;
 export type AlertChannelRow = typeof alertChannels.$inferSelect;
 export type BackupScheduleRow = typeof backupSchedule.$inferSelect;
 export type ApiTokenRow = typeof apiTokens.$inferSelect;
+export type SsoConfigRow = typeof ssoConfig.$inferSelect;

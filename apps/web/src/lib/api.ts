@@ -29,6 +29,10 @@ import {
   type SshKey,
   type SshTestResult,
   type UpdateRouteInput,
+  type SsoStatus,
+  type SsoConfig,
+  type SsoExchangeInput,
+  type UpdateSsoConfigInput,
   type ApiToken,
   type FleetRun,
   type RunFleetOperationInput,
@@ -220,6 +224,13 @@ export const api = {
     create: (b: CreateWorkspaceInput) => post<Workspace>('/workspaces', b),
     rename: (id: string, b: UpdateWorkspaceInput) => patch<Workspace>(`/workspaces/${id}`, b),
     remove: (id: string) => del<{ ok: true }>(`/workspaces/${id}`),
+  },
+  sso: {
+    /** Public: the login screen asks this before anyone has authenticated. */
+    status: () => get<SsoStatus>('/sso/status'),
+    exchange: (b: SsoExchangeInput) => post<AuthToken>('/sso/exchange', b),
+    config: () => get<SsoConfig>('/sso/config'),
+    update: (b: UpdateSsoConfigInput) => patch<SsoConfig>('/sso/config', b),
   },
   license: {
     get: () => get<LicenseStatus>('/license'),

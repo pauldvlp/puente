@@ -10,6 +10,7 @@ import { AuditModule } from './audit/audit.module';
 import { BackupProModule } from './backup/backup-pro.module';
 import { TokensProModule } from './tokens/tokens-pro.module';
 import { FleetModule } from './fleet/fleet.module';
+import { SsoModule } from './sso/sso.module';
 
 /**
  * puente Pro. Licensed under the puente Commercial License — see `ee/LICENSE.md`.
@@ -27,6 +28,7 @@ import { FleetModule } from './fleet/fleet.module';
     BackupProModule,
     TokensProModule,
     FleetModule,
+    SsoModule,
   ],
   controllers: [LicenseController],
   providers: [LicenseService, ProGuard, { provide: APP_GUARD, useClass: ProGuard }],

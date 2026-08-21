@@ -6,6 +6,7 @@ import type {
   EventQueryInput,
   RunFleetOperationInput,
   UpdateBackupScheduleInput,
+  UpdateSsoConfigInput,
   CreateTeamMemberInput,
   UpdateTeamMemberInput,
   CreateAlertChannelInput,
@@ -91,6 +92,23 @@ export function useApiTokenMutations() {
   });
 
   return { create, revoke };
+}
+
+export const useSsoConfig = (enabled: boolean) =>
+  useQuery({ queryKey: qk.ssoConfig, queryFn: api.sso.config, enabled });
+
+export function useSsoMutations() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (b: UpdateSsoConfigInput) => api.sso.update(b),
+    onSuccess: (config) => {
+      qc.setQueryData(qk.ssoConfig, config);
+      toast.success(
+        config.enabled ? `Sign-in with ${config.label} is on` : 'Single sign-on is off',
+      );
+    },
+    onError: notifyError,
+  });
 }
 
 export const useBackupSchedule = (enabled: boolean) =>

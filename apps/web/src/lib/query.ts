@@ -26,5 +26,6 @@ export const qk = {
   team: ['team'] as const,
   apiTokens: ['api-tokens'] as const,
   backupSchedule: ['backup-schedule'] as const,
+  ssoConfig: ['sso-config'] as const,
   backupFiles: ['backup-files'] as const,
 };

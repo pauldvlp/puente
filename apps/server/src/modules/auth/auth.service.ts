@@ -58,6 +58,11 @@ export class AuthService {
     return this.issue(row);
   }
 
+  /** Issue a session for a user that some other path has already authenticated (SSO). */
+  issueFor(row: UserRow): AuthToken {
+    return this.issue(row);
+  }
+
   private issue(row: UserRow): AuthToken {
     const user: SessionUser = {
       id: row.id,
