@@ -8,20 +8,34 @@ export const users = sqliteTable('users', {
   createdAt: integer('created_at').notNull(),
 });
 
+/**
+ * App-wide preferences. The Cloudflare connection used to live here; it moved to `workspaces`
+ * so several accounts can sit side by side — see db/migrations.ts.
+ */
 export const settings = sqliteTable('settings', {
   id: text('id').primaryKey(), // always 'app'
+  healthPollSeconds: integer('health_poll_seconds').notNull().default(30),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
+/** One Cloudflare account and everything published through it. */
+export const workspaces = sqliteTable('workspaces', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
   cloudflareAuthMode: text('cloudflare_auth_mode'),
   cloudflareApiTokenEnc: text('cloudflare_api_token_enc'),
   cloudflareAccountId: text('cloudflare_account_id'),
   cloudflareAccountName: text('cloudflare_account_name'),
   defaultZoneId: text('default_zone_id'),
-  healthPollSeconds: integer('health_poll_seconds').notNull().default(30),
+  isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at').notNull(),
   updatedAt: integer('updated_at').notNull(),
 });
 
 export const zones = sqliteTable('zones', {
   id: text('id').primaryKey(),
+  workspaceId: text('workspace_id'),
   name: text('name').notNull(),
   status: text('status'),
   accountId: text('account_id'),
@@ -30,6 +44,7 @@ export const zones = sqliteTable('zones', {
 
 export const nodes = sqliteTable('nodes', {
   id: text('id').primaryKey(),
+  workspaceId: text('workspace_id'),
   name: text('name').notNull(),
   kind: text('kind').notNull(), // 'local' | 'ssh'
   sshHost: text('ssh_host'),
@@ -58,6 +73,7 @@ export const nodes = sqliteTable('nodes', {
 
 export const routes = sqliteTable('routes', {
   id: text('id').primaryKey(),
+  workspaceId: text('workspace_id'),
   nodeId: text('node_id').notNull(),
   hostname: text('hostname').notNull(),
   subdomain: text('subdomain').notNull(),
@@ -113,6 +129,7 @@ export const alertChannels = sqliteTable('alert_channels', {
 
 export type UserRow = typeof users.$inferSelect;
 export type SettingsRow = typeof settings.$inferSelect;
+export type WorkspaceRow = typeof workspaces.$inferSelect;
 export type ZoneRow = typeof zones.$inferSelect;
 export type NodeRow = typeof nodes.$inferSelect;
 export type RouteRow = typeof routes.$inferSelect;

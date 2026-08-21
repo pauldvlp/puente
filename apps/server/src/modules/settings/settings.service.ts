@@ -1,19 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { CloudflareZone, UpdateSettingsInput } from '@puente/shared';
 import { DbService } from '../../db/db.service';
 import { CryptoService } from '../../common/crypto.service';
 import { settings, zones, type SettingsRow, type ZoneRow } from '../../db/schema';
 import { nowMs } from '../../common/time';
+import { WorkspacesService } from '../workspaces/workspaces.service';
 
 const APP_ID = 'app';
 
-/** Low-level persistence for the singleton app settings + Cloudflare credentials. */
+/**
+ * App-wide preferences, plus the Cloudflare connection of whichever workspace the caller is in.
+ *
+ * The connection used to be stored here, one per install. It now lives on the workspace, but this
+ * service keeps the same shape so nodes, routes and the Cloudflare client did not have to learn
+ * about workspaces at all — they ask for "the token" and get the right one.
+ */
 @Injectable()
 export class SettingsService {
   constructor(
     private readonly dbs: DbService,
     private readonly crypto: CryptoService,
+    private readonly workspaces: WorkspacesService,
   ) {}
 
   private get db() {
@@ -26,11 +34,6 @@ export class SettingsService {
     const now = nowMs();
     const row: SettingsRow = {
       id: APP_ID,
-      cloudflareAuthMode: null,
-      cloudflareApiTokenEnc: null,
-      cloudflareAccountId: null,
-      cloudflareAccountName: null,
-      defaultZoneId: null,
       healthPollSeconds: 30,
       createdAt: now,
       updatedAt: now,
@@ -43,68 +46,77 @@ export class SettingsService {
     return this.getOrInit();
   }
 
+  // --- Cloudflare connection (per workspace) --------------------------------
+
   isCloudflareConnected(): boolean {
-    return Boolean(this.get().cloudflareApiTokenEnc || this.get().cloudflareAuthMode === 'cert');
+    const ws = this.workspaces.current();
+    return Boolean(ws.cloudflareApiTokenEnc || ws.cloudflareAuthMode === 'cert');
   }
 
   getCloudflareToken(): string | null {
-    return this.crypto.tryDecrypt(this.get().cloudflareApiTokenEnc);
+    return this.crypto.tryDecrypt(this.workspaces.current().cloudflareApiTokenEnc);
   }
 
   getAccountId(): string | null {
-    return this.get().cloudflareAccountId;
+    return this.workspaces.current().cloudflareAccountId;
+  }
+
+  getDefaultZoneId(): string | null {
+    return this.workspaces.current().defaultZoneId;
   }
 
   setCloudflareToken(token: string, accountId: string, accountName: string | null): void {
-    this.getOrInit();
-    this.db
-      .update(settings)
-      .set({
-        cloudflareAuthMode: 'token',
-        cloudflareApiTokenEnc: this.crypto.encrypt(token),
-        cloudflareAccountId: accountId,
-        cloudflareAccountName: accountName,
-        updatedAt: nowMs(),
-      })
-      .where(eq(settings.id, APP_ID))
-      .run();
+    const ws = this.workspaces.current();
+    this.workspaces.patch(ws.id, {
+      cloudflareAuthMode: 'token',
+      cloudflareApiTokenEnc: this.crypto.encrypt(token),
+      cloudflareAccountId: accountId,
+      cloudflareAccountName: accountName,
+      // A workspace still called "Default" takes the account's name once we know it.
+      name: ws.name === 'Default' && accountName ? accountName : ws.name,
+    });
   }
 
   clearCloudflare(): void {
-    this.db
-      .update(settings)
-      .set({
-        cloudflareAuthMode: null,
-        cloudflareApiTokenEnc: null,
-        cloudflareAccountId: null,
-        cloudflareAccountName: null,
-        updatedAt: nowMs(),
-      })
-      .where(eq(settings.id, APP_ID))
-      .run();
-    this.db.delete(zones).run();
+    const ws = this.workspaces.current();
+    this.workspaces.patch(ws.id, {
+      cloudflareAuthMode: null,
+      cloudflareApiTokenEnc: null,
+      cloudflareAccountId: null,
+      cloudflareAccountName: null,
+      defaultZoneId: null,
+    });
+    this.db.delete(zones).where(eq(zones.workspaceId, ws.id)).run();
   }
 
   update(dto: UpdateSettingsInput): SettingsRow {
     this.getOrInit();
-    const patch: Partial<SettingsRow> = { updatedAt: nowMs() };
-    if (dto.defaultZoneId !== undefined) patch.defaultZoneId = dto.defaultZoneId;
-    if (dto.healthPollSeconds !== undefined) patch.healthPollSeconds = dto.healthPollSeconds;
-    this.db.update(settings).set(patch).where(eq(settings.id, APP_ID)).run();
+    if (dto.healthPollSeconds !== undefined) {
+      this.db
+        .update(settings)
+        .set({ healthPollSeconds: dto.healthPollSeconds, updatedAt: nowMs() })
+        .where(eq(settings.id, APP_ID))
+        .run();
+    }
+    if (dto.defaultZoneId !== undefined) {
+      this.workspaces.patch(this.workspaces.currentId(), { defaultZoneId: dto.defaultZoneId });
+    }
     return this.get();
   }
 
-  // --- Zone cache -----------------------------------------------------------
+  // --- Zone cache (per workspace) -------------------------------------------
 
   saveZones(list: CloudflareZone[]): void {
     const now = nowMs();
+    const workspaceId = this.workspaces.currentId();
     const tx = this.dbs.sqlite.transaction(() => {
-      this.db.delete(zones).run();
+      this.db.delete(zones).where(eq(zones.workspaceId, workspaceId)).run();
       for (const z of list) {
         this.db
           .insert(zones)
           .values({
             id: z.id,
+            workspaceId,
             name: z.name,
             status: z.status ?? null,
             accountId: z.accountId ?? null,
@@ -120,6 +132,7 @@ export class SettingsService {
     return this.db
       .select()
       .from(zones)
+      .where(eq(zones.workspaceId, this.workspaces.currentId()))
       .all()
       .map((z: ZoneRow) => ({
         id: z.id,
@@ -130,6 +143,10 @@ export class SettingsService {
   }
 
   getZone(zoneId: string): ZoneRow | undefined {
-    return this.db.select().from(zones).where(eq(zones.id, zoneId)).get();
+    return this.db
+      .select()
+      .from(zones)
+      .where(and(eq(zones.id, zoneId), eq(zones.workspaceId, this.workspaces.currentId())))
+      .get();
   }
 }

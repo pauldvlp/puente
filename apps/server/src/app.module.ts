@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
@@ -6,6 +6,8 @@ import { CommonModule } from './common/common.module';
 import { DbModule } from './db/db.module';
 import { EventsModule } from './modules/events/events.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { WorkspacesModule } from './modules/workspaces/workspaces.module';
+import { WorkspaceScopeMiddleware } from './modules/workspaces/workspace-scope.middleware';
 import { CloudflareModule } from './modules/cloudflare/cloudflare.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SshModule } from './modules/ssh/ssh.module';
@@ -31,6 +33,7 @@ const PUBLIC_DIR = join(__dirname, 'public');
       : []),
     CommonModule,
     DbModule,
+    WorkspacesModule,
     EventsModule,
     SettingsModule,
     CloudflareModule,
@@ -43,4 +46,10 @@ const PUBLIC_DIR = join(__dirname, 'public');
   ],
   controllers: [SetupController],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    // Everything under /api runs inside a workspace scope, including requests that never
+    // mention one — they get the default.
+    consumer.apply(WorkspaceScopeMiddleware).forRoutes('*');
+  }
+}

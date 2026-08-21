@@ -6,6 +6,7 @@ import type { CloudflareService } from '../cloudflare/cloudflare.service';
 import type { SettingsService } from '../settings/settings.service';
 import type { EventsService } from '../events/events.service';
 import type { EventBus } from '../../common/event-bus.service';
+import type { WorkspacesService } from '../workspaces/workspaces.service';
 
 /**
  * Integration: a real (throwaway) SQLite under the isolated PUENTE_DATA_DIR, with
@@ -19,9 +20,13 @@ const settings = {
   getZone: () => ({ id: 'z1', name: 'example.com' }),
 } as unknown as SettingsService;
 const events = { info: vi.fn(), success: vi.fn(), error: vi.fn() } as unknown as EventsService;
-const bus = { emit: vi.fn() } as unknown as EventBus;
+const bus = { emit: vi.fn(), fact: vi.fn() } as unknown as EventBus;
+// Single-workspace install, which is what every Community user has.
+const workspaces = {
+  currentId: () => 'ws_default',
+} as unknown as WorkspacesService;
 
-const svc = new RoutesService(dbs, cloudflare, settings, events, bus);
+const svc = new RoutesService(dbs, cloudflare, settings, events, bus, workspaces);
 
 const t = Date.now();
 const aNode = (over: Partial<typeof nodes.$inferInsert> = {}): typeof nodes.$inferInsert => ({
