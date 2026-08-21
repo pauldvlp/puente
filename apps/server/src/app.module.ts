@@ -8,6 +8,7 @@ import { EventsModule } from './modules/events/events.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { TeamModule } from './modules/team/team.module';
+import { BackupModule } from './modules/backup/backup.module';
 import { WorkspaceScopeMiddleware } from './modules/workspaces/workspace-scope.middleware';
 import { CloudflareModule } from './modules/cloudflare/cloudflare.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -40,6 +41,7 @@ const PUBLIC_DIR = join(__dirname, 'public');
     CloudflareModule,
     AuthModule,
     TeamModule,
+    BackupModule,
     EeModule,
     SshModule,
     CloudflaredModule,
