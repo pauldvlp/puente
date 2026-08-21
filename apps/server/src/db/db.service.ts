@@ -139,6 +139,21 @@ CREATE TABLE IF NOT EXISTS workspaces (
   updated_at INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS backup_schedule (
+  id TEXT PRIMARY KEY,
+  enabled INTEGER NOT NULL DEFAULT 0,
+  frequency TEXT NOT NULL DEFAULT 'daily',
+  hour INTEGER NOT NULL DEFAULT 3,
+  weekday INTEGER NOT NULL DEFAULT 0,
+  keep INTEGER NOT NULL DEFAULT 7,
+  directory TEXT NOT NULL,
+  passphrase_enc TEXT,
+  last_run_at INTEGER,
+  last_error TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_routes_node ON routes(node_id);
 CREATE INDEX IF NOT EXISTS idx_events_ts ON events(ts);
 `;

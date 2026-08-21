@@ -132,6 +132,22 @@ export const alertChannels = sqliteTable('alert_channels', {
   updatedAt: integer('updated_at').notNull(),
 });
 
+export const backupSchedule = sqliteTable('backup_schedule', {
+  id: text('id').primaryKey(), // always 'current'
+  enabled: integer('enabled', { mode: 'boolean' }).notNull().default(false),
+  frequency: text('frequency').notNull().default('daily'),
+  hour: integer('hour').notNull().default(3),
+  weekday: integer('weekday').notNull().default(0),
+  keep: integer('keep').notNull().default(7),
+  directory: text('directory').notNull(),
+  /** Encrypted with the master key: unattended backups cannot prompt for it. */
+  passphraseEnc: text('passphrase_enc'),
+  lastRunAt: integer('last_run_at'),
+  lastError: text('last_error'),
+  createdAt: integer('created_at').notNull(),
+  updatedAt: integer('updated_at').notNull(),
+});
+
 export type UserRow = typeof users.$inferSelect;
 export type SettingsRow = typeof settings.$inferSelect;
 export type WorkspaceRow = typeof workspaces.$inferSelect;
@@ -141,3 +157,4 @@ export type RouteRow = typeof routes.$inferSelect;
 export type EventRow = typeof events.$inferSelect;
 export type LicenseRow = typeof license.$inferSelect;
 export type AlertChannelRow = typeof alertChannels.$inferSelect;
+export type BackupScheduleRow = typeof backupSchedule.$inferSelect;

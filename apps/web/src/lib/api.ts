@@ -29,7 +29,10 @@ import {
   type SshKey,
   type SshTestResult,
   type UpdateRouteInput,
+  type BackupFile,
+  type BackupSchedule,
   type EventQueryInput,
+  type UpdateBackupScheduleInput,
   type UpdateSettingsInput,
   type UpdateWorkspaceInput,
   type Workspace,
@@ -173,6 +176,14 @@ export const api = {
       const qs = params.toString();
       return get<ActivityEvent[]>(`/events${qs ? `?${qs}` : ''}`);
     },
+  },
+  backups: {
+    schedule: () => get<BackupSchedule>('/backup/schedule'),
+    update: (b: UpdateBackupScheduleInput) => patch<BackupSchedule>('/backup/schedule', b),
+    files: () => get<BackupFile[]>('/backup/schedule/files'),
+    run: () => post<BackupFile>('/backup/schedule/run'),
+    remove: (name: string) =>
+      del<{ ok: true }>(`/backup/schedule/files/${encodeURIComponent(name)}`),
   },
   audit: {
     /** Returns the file as a blob; the caller hands it to the browser as a download. */
