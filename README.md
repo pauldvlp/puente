@@ -18,6 +18,10 @@ npx puente           # run it right now — panel + guided setup, in the backgro
 npm install -g puente && puente
 ```
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pauldvlp/puente/main/docs/assets/demo.gif" alt="Three machines, four public hostnames, one panel" width="820">
+</p>
+
 > Published as **[`puente`](https://www.npmjs.com/package/puente)** (and the identical
 > scoped alias **[`@pauldvlp/puente`](https://www.npmjs.com/package/@pauldvlp/puente)**).
 > Full install & usage docs live in [`apps/server/README.md`](apps/server/README.md).
