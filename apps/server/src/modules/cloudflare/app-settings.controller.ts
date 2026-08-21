@@ -4,6 +4,7 @@ import { ZodBody } from '../../common/zod-validation.pipe';
 import { CloudflareService } from './cloudflare.service';
 import { SettingsService } from '../settings/settings.service';
 import { DATA_DIR } from '../../config/paths';
+import { MinRole } from '../auth/min-role.decorator';
 
 @Controller('settings')
 export class AppSettingsController {
@@ -24,6 +25,7 @@ export class AppSettingsController {
     };
   }
 
+  @MinRole('owner')
   @Patch()
   update(@Body(new ZodBody(UpdateSettingsSchema)) dto: UpdateSettingsInput): AppSettings {
     this.settings.update(dto);

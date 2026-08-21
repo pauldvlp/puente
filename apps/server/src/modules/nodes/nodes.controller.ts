@@ -22,6 +22,7 @@ import {
 } from '@puente/shared';
 import { ZodBody } from '../../common/zod-validation.pipe';
 import { NodesService } from './nodes.service';
+import { MinRole } from '../auth/min-role.decorator';
 
 @Controller('nodes')
 export class NodesController {
@@ -47,6 +48,8 @@ export class NodesController {
     return this.nodes.update(id, dto);
   }
 
+  // Removing a node tears down its connector; that is an owner's call.
+  @MinRole('owner')
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<{ ok: true }> {
     await this.nodes.remove(id);

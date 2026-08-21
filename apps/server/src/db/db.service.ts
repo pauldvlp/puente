@@ -3,7 +3,7 @@ import Database from 'better-sqlite3';
 import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { DB_PATH, ensureDataDir } from '../config/paths';
 import * as schema from './schema';
-import { migrateToWorkspaces } from './migrations';
+import { migrateToRoles, migrateToWorkspaces } from './migrations';
 
 /**
  * Idempotent DDL. We ship an embedded schema bootstrap (CREATE TABLE IF NOT
@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'owner',
   created_at INTEGER NOT NULL
 );
 
@@ -155,6 +156,7 @@ export class DbService implements OnModuleDestroy {
     this.sqlite.exec(BOOTSTRAP_SQL);
     // Runs on every boot and is a no-op once applied; see migrations.ts.
     const report = migrateToWorkspaces(this.sqlite, Date.now());
+    migrateToRoles(this.sqlite);
     if (report.workspaceCreated || report.rowsAssigned > 0) {
       this.logger.log(
         `Workspaces ready${report.connectionMoved ? ' (Cloudflare connection moved into it)' : ''}` +

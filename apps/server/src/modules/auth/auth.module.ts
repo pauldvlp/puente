@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { RolesGuard } from './roles.guard';
 import { getOrCreateJwtSecret } from '../../config/secrets';
 
 @Module({
@@ -15,7 +16,12 @@ import { getOrCreateJwtSecret } from '../../config/secrets';
       }),
     }),
   ],
-  providers: [AuthService, { provide: APP_GUARD, useClass: JwtAuthGuard }],
+  providers: [
+    AuthService,
+    // Order matters: JwtAuthGuard populates req.user, RolesGuard reads it.
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
   controllers: [AuthController],
   exports: [AuthService],
 })

@@ -5,6 +5,8 @@ export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
   username: text('username').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
+  /** 'owner' | 'operator' | 'viewer'. Installs from before teams get 'owner'. */
+  role: text('role').notNull().default('owner'),
   createdAt: integer('created_at').notNull(),
 });
 

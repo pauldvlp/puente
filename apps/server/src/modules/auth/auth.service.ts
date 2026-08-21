@@ -33,6 +33,8 @@ export class AuthService {
       id: newId('user'),
       username: dto.username.toLowerCase(),
       passwordHash: this.crypto.hashPassword(dto.password),
+      // Whoever sets the panel up owns it. Teammates come later, with lesser roles.
+      role: 'owner',
       createdAt: nowMs(),
     };
     this.dbs.db.insert(users).values(row).run();
@@ -57,8 +59,12 @@ export class AuthService {
   }
 
   private issue(row: UserRow): AuthToken {
-    const user: SessionUser = { id: row.id, username: row.username };
-    const token = this.jwt.sign({ sub: row.id, username: row.username });
+    const user: SessionUser = {
+      id: row.id,
+      username: row.username,
+      role: row.role as SessionUser['role'],
+    };
+    const token = this.jwt.sign({ sub: row.id, username: row.username, role: user.role });
     return { token, user };
   }
 }
