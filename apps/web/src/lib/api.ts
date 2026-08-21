@@ -29,7 +29,10 @@ import {
   type SshKey,
   type SshTestResult,
   type UpdateRouteInput,
+  type ApiToken,
   type BackupFile,
+  type CreateApiTokenInput,
+  type CreatedApiToken,
   type BackupSchedule,
   type EventQueryInput,
   type UpdateBackupScheduleInput,
@@ -176,6 +179,11 @@ export const api = {
       const qs = params.toString();
       return get<ActivityEvent[]>(`/events${qs ? `?${qs}` : ''}`);
     },
+  },
+  apiTokens: {
+    list: () => get<ApiToken[]>('/api-tokens'),
+    create: (b: CreateApiTokenInput) => post<CreatedApiToken>('/api-tokens', b),
+    revoke: (id: string) => del<{ ok: true }>(`/api-tokens/${id}`),
   },
   backups: {
     schedule: () => get<BackupSchedule>('/backup/schedule'),

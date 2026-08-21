@@ -148,6 +148,20 @@ export const backupSchedule = sqliteTable('backup_schedule', {
   updatedAt: integer('updated_at').notNull(),
 });
 
+export const apiTokens = sqliteTable('api_tokens', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  role: text('role').notNull(),
+  /** SHA-256 of the token. The token itself is shown once and never stored. */
+  tokenHash: text('token_hash').notNull().unique(),
+  /** First characters of the token, so the list can tell them apart. */
+  hint: text('hint').notNull(),
+  createdBy: text('created_by'),
+  createdAt: integer('created_at').notNull(),
+  lastUsedAt: integer('last_used_at'),
+  expiresAt: integer('expires_at'),
+});
+
 export type UserRow = typeof users.$inferSelect;
 export type SettingsRow = typeof settings.$inferSelect;
 export type WorkspaceRow = typeof workspaces.$inferSelect;
@@ -158,3 +172,4 @@ export type EventRow = typeof events.$inferSelect;
 export type LicenseRow = typeof license.$inferSelect;
 export type AlertChannelRow = typeof alertChannels.$inferSelect;
 export type BackupScheduleRow = typeof backupSchedule.$inferSelect;
+export type ApiTokenRow = typeof apiTokens.$inferSelect;

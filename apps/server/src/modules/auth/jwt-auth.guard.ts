@@ -1,7 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
+import { API_TOKEN_PREFIX } from '@puente/shared';
 import { IS_PUBLIC_KEY } from '../../common/public.decorator';
+import { ApiTokenService } from './api-token.service';
 
 /** Minimal shape we read off the incoming request (avoids an express type dep). */
 interface HttpRequest {
@@ -15,6 +17,7 @@ export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwt: JwtService,
     private readonly reflector: Reflector,
+    private readonly tokens: ApiTokenService,
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -34,6 +37,21 @@ export class JwtAuthGuard implements CanActivate {
         code: 'UNAUTHORIZED',
       });
     }
+    // An API token authenticates the same way, and carries its own role from there on.
+    if (token.startsWith(API_TOKEN_PREFIX)) {
+      const identity = this.tokens.authenticate(token);
+      if (!identity) {
+        throw new UnauthorizedException({
+          statusCode: 401,
+          error: 'Unauthorized',
+          message: 'That API token is not valid, or it has expired.',
+          code: 'UNAUTHORIZED',
+        });
+      }
+      req.user = identity;
+      return true;
+    }
+
     try {
       const payload = this.jwt.verify<{ sub: string; username: string; role?: string }>(token);
       // Tokens issued before roles existed carry none; they belong to the sole account, so owner.

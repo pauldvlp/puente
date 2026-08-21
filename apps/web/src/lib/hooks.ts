@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type {
   ActivateLicenseInput,
+  CreateApiTokenInput,
   EventQueryInput,
   UpdateBackupScheduleInput,
   CreateTeamMemberInput,
@@ -52,6 +53,30 @@ export const useEvents = (filters: EventQueryInput = {}) =>
 /** Current edition. Cached hard: a license changes when someone pastes a key, not on its own. */
 export const useLicense = () =>
   useQuery({ queryKey: qk.license, queryFn: api.license.get, staleTime: 60_000 });
+
+export const useApiTokens = () => useQuery({ queryKey: qk.apiTokens, queryFn: api.apiTokens.list });
+
+export function useApiTokenMutations() {
+  const qc = useQueryClient();
+  const invalidate = () => qc.invalidateQueries({ queryKey: qk.apiTokens });
+
+  const create = useMutation({
+    mutationFn: (b: CreateApiTokenInput) => api.apiTokens.create(b),
+    onSuccess: invalidate,
+    onError: notifyError,
+  });
+
+  const revoke = useMutation({
+    mutationFn: (id: string) => api.apiTokens.revoke(id),
+    onSuccess: () => {
+      invalidate();
+      toast.success('Token revoked');
+    },
+    onError: notifyError,
+  });
+
+  return { create, revoke };
+}
 
 export const useBackupSchedule = (enabled: boolean) =>
   useQuery({ queryKey: qk.backupSchedule, queryFn: api.backups.schedule, enabled });

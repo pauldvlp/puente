@@ -34,6 +34,7 @@ import { AlertsCard } from '../ee/AlertsCard';
 import { BackupsCard } from '../ee/BackupsCard';
 import { WorkspacesCard } from '../components/WorkspacesCard';
 import { TeamCard } from '../components/TeamCard';
+import { TokensCard } from '../components/TokensCard';
 
 const NONE = '__none__';
 
@@ -120,6 +121,8 @@ export function SettingsPage() {
       <WorkspacesCard />
 
       <TeamCard />
+
+      <TokensCard />
 
       <LicenseCard />
 
