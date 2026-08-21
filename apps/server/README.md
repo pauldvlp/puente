@@ -14,6 +14,10 @@ port 7008 on a remote host (SSH)  →  vw.example.com
 
 Everything is driven from one beautiful web UI. puente talks to the Cloudflare API to create the tunnels + DNS, and orchestrates the `cloudflared` connector on each machine (locally or over SSH) for you.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pauldvlp/puente/main/docs/assets/demo.gif" alt="Three machines, four public hostnames, one panel" width="820">
+</p>
+
 ---
 
 ## Install & run
