@@ -13,8 +13,10 @@ import { RequiresPro } from '../license/requires-pro.decorator';
 import { AlertsService } from './alerts.service';
 import { buildPayload } from './alert-rules';
 import { nowMs } from '../../common/time';
+import { MinRole } from '../../modules/auth/min-role.decorator';
 
 @RequiresPro('alerts')
+@MinRole('owner')
 @Controller('alerts/channels')
 export class AlertsController {
   constructor(private readonly alerts: AlertsService) {}

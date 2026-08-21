@@ -6,6 +6,7 @@ import {
 } from '@puente/shared';
 import { ZodBody } from '../../common/zod-validation.pipe';
 import { LicenseService } from './license.service';
+import { MinRole } from '../../modules/auth/min-role.decorator';
 
 @Controller('license')
 export class LicenseController {
@@ -17,11 +18,13 @@ export class LicenseController {
     return this.licenses.status();
   }
 
+  @MinRole('owner')
   @Post()
   activate(@Body(new ZodBody(ActivateLicenseSchema)) dto: ActivateLicenseInput): LicenseStatus {
     return this.licenses.activate(dto.key);
   }
 
+  @MinRole('owner')
   @Delete()
   deactivate(): LicenseStatus {
     return this.licenses.deactivate();

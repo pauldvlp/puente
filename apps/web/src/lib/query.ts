@@ -23,4 +23,5 @@ export const qk = {
   license: ['license'] as const,
   alertChannels: ['alert-channels'] as const,
   workspaces: ['workspaces'] as const,
+  team: ['team'] as const,
 };

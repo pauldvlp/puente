@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type {
   ActivateLicenseInput,
+  CreateTeamMemberInput,
+  UpdateTeamMemberInput,
   CreateAlertChannelInput,
   CreateWorkspaceInput,
   UpdateAlertChannelInput,
@@ -44,6 +46,40 @@ export const useEvents = () =>
 /** Current edition. Cached hard: a license changes when someone pastes a key, not on its own. */
 export const useLicense = () =>
   useQuery({ queryKey: qk.license, queryFn: api.license.get, staleTime: 60_000 });
+
+export const useTeam = () => useQuery({ queryKey: qk.team, queryFn: api.team.list });
+
+export function useTeamMutations() {
+  const qc = useQueryClient();
+  const invalidate = () => qc.invalidateQueries({ queryKey: qk.team });
+
+  const create = useMutation({
+    mutationFn: (b: CreateTeamMemberInput) => api.team.create(b),
+    onSuccess: (m) => {
+      invalidate();
+      toast.success(`${m.username} can now sign in`);
+    },
+    onError: notifyError,
+  });
+
+  const update = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: UpdateTeamMemberInput }) =>
+      api.team.update(id, body),
+    onSuccess: invalidate,
+    onError: notifyError,
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) => api.team.remove(id),
+    onSuccess: () => {
+      invalidate();
+      toast.success('Account removed');
+    },
+    onError: notifyError,
+  });
+
+  return { create, update, remove };
+}
 
 export const useWorkspaces = () =>
   useQuery({ queryKey: qk.workspaces, queryFn: api.workspaces.list, staleTime: 30_000 });

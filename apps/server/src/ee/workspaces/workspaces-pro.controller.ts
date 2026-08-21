@@ -9,6 +9,7 @@ import { ZodBody } from '../../common/zod-validation.pipe';
 import { WorkspacesService } from '../../modules/workspaces/workspaces.service';
 import { toWorkspaceDto } from '../../modules/workspaces/workspace.mapper';
 import { RequiresPro } from '../license/requires-pro.decorator';
+import { MinRole } from '../../modules/auth/min-role.decorator';
 
 /**
  * Running more than one Cloudflare account side by side is the Agency capability.
@@ -18,6 +19,7 @@ import { RequiresPro } from '../license/requires-pro.decorator';
  * already had.
  */
 @RequiresPro('workspaces')
+@MinRole('owner')
 @Controller('workspaces')
 export class WorkspacesProController {
   constructor(private readonly workspaces: WorkspacesService) {}

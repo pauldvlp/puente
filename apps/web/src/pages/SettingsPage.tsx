@@ -32,6 +32,7 @@ import { ConnectCloudflare } from '../components/ConnectCloudflare';
 import { LicenseCard } from '../ee/LicenseCard';
 import { AlertsCard } from '../ee/AlertsCard';
 import { WorkspacesCard } from '../components/WorkspacesCard';
+import { TeamCard } from '../components/TeamCard';
 
 const NONE = '__none__';
 
@@ -116,6 +117,8 @@ export function SettingsPage() {
       </Card>
 
       <WorkspacesCard />
+
+      <TeamCard />
 
       <LicenseCard />
 
