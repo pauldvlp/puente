@@ -8,6 +8,7 @@ import { bootstrap } from './main';
 import { DATA_DIR, DB_PATH, LOG_PATH } from './config/paths';
 import { APP_VERSION } from './config/version';
 import { runLicenseCommand } from './ee/license/license.cli';
+import { runBackupCommand, runRestoreCommand } from './modules/backup/backup.cli';
 import {
   DaemonStartError,
   clearState,
@@ -22,12 +23,7 @@ import {
 
 const DEFAULT_PORT = Number(process.env.PUENTE_PORT ?? process.env.PORT ?? 5006);
 
-const cyan = (s: string) => `\x1b[36m${s}\x1b[0m`;
-const green = (s: string) => `\x1b[32m${s}\x1b[0m`;
-const yellow = (s: string) => `\x1b[33m${s}\x1b[0m`;
-const red = (s: string) => `\x1b[31m${s}\x1b[0m`;
-const dim = (s: string) => `\x1b[2m${s}\x1b[0m`;
-const bold = (s: string) => `\x1b[1m${s}\x1b[0m`;
+import { bold, cyan, dim, green, red, yellow } from './common/colour';
 
 function banner(url: string, footer: string[]): void {
   const line = '─'.repeat(46);
@@ -254,6 +250,23 @@ program
       return;
     }
     runLicenseCommand(verb, key);
+  });
+
+program
+  .command('backup')
+  .description('Write an encrypted backup of this install (database + keys)')
+  .option('-o, --out <file>', 'where to write it')
+  .option('--passphrase <phrase>', 'skip the prompt (it will land in your shell history)')
+  .action(async (opts: { out?: string; passphrase?: string }) => {
+    await runBackupCommand(opts);
+  });
+
+program
+  .command('restore [file]')
+  .description('Restore an encrypted backup over this install (stop the panel first)')
+  .option('--passphrase <phrase>', 'skip the prompt')
+  .action(async (file: string | undefined, opts: { passphrase?: string }) => {
+    await runRestoreCommand(file, opts);
   });
 
 program
