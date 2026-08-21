@@ -35,8 +35,9 @@ export class JwtAuthGuard implements CanActivate {
       });
     }
     try {
-      const payload = this.jwt.verify<{ sub: string; username: string }>(token);
-      req.user = { id: payload.sub, username: payload.username };
+      const payload = this.jwt.verify<{ sub: string; username: string; role?: string }>(token);
+      // Tokens issued before roles existed carry none; they belong to the sole account, so owner.
+      req.user = { id: payload.sub, username: payload.username, role: payload.role ?? 'owner' };
       return true;
     } catch {
       throw new UnauthorizedException({

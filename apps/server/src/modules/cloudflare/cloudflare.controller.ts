@@ -9,6 +9,7 @@ import {
 import { ZodBody } from '../../common/zod-validation.pipe';
 import { CloudflareService } from './cloudflare.service';
 import { SettingsService } from '../settings/settings.service';
+import { MinRole } from '../auth/min-role.decorator';
 
 @Controller('cloudflare')
 export class CloudflareController {
@@ -24,6 +25,7 @@ export class CloudflareController {
   }
 
   /** Connect + persist the token, selecting an account. */
+  @MinRole('owner')
   @Post('connect')
   connect(
     @Body(new ZodBody(ConnectTokenSchema)) dto: ConnectTokenInput,
@@ -36,6 +38,7 @@ export class CloudflareController {
     return this.cloudflare.getConnection();
   }
 
+  @MinRole('owner')
   @Post('disconnect')
   disconnect(): { ok: true } {
     this.settings.clearCloudflare();

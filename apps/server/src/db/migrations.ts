@@ -151,3 +151,16 @@ function readLegacyConnection(sqlite: Database.Database): LegacyConnection | nul
     .get() as LegacyConnection | undefined;
   return row ?? null;
 }
+
+/**
+ * Gives every existing account a role.
+ *
+ * An install from before teams has exactly one user who could do everything, so they become the
+ * owner. Anything else would lock somebody out of their own panel on an upgrade.
+ */
+export function migrateToRoles(sqlite: Database.Database): boolean {
+  if (!tableExists(sqlite, 'users')) return false;
+  if (columnExists(sqlite, 'users', 'role')) return false;
+  sqlite.exec(`ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'owner'`);
+  return true;
+}
