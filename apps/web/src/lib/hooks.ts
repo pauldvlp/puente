@@ -4,6 +4,7 @@ import type {
   ActivateLicenseInput,
   CreateApiTokenInput,
   EventQueryInput,
+  RunFleetOperationInput,
   UpdateBackupScheduleInput,
   CreateTeamMemberInput,
   UpdateTeamMemberInput,
@@ -53,6 +54,20 @@ export const useEvents = (filters: EventQueryInput = {}) =>
 /** Current edition. Cached hard: a license changes when someone pastes a key, not on its own. */
 export const useLicense = () =>
   useQuery({ queryKey: qk.license, queryFn: api.license.get, staleTime: 60_000 });
+
+/** A fleet run is long — the mutation resolves when every machine has been attempted. */
+export function useFleet() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (b: RunFleetOperationInput) => api.fleet.run(b),
+    onSuccess: (run) => {
+      qc.invalidateQueries({ queryKey: qk.nodes });
+      if (run.failed > 0) toast.warning(`${run.succeeded} done, ${run.failed} failed`);
+      else toast.success(`${run.succeeded} node(s) updated`);
+    },
+    onError: notifyError,
+  });
+}
 
 export const useApiTokens = () => useQuery({ queryKey: qk.apiTokens, queryFn: api.apiTokens.list });
 

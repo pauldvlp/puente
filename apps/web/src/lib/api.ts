@@ -30,6 +30,8 @@ import {
   type SshTestResult,
   type UpdateRouteInput,
   type ApiToken,
+  type FleetRun,
+  type RunFleetOperationInput,
   type BackupFile,
   type CreateApiTokenInput,
   type CreatedApiToken,
@@ -179,6 +181,9 @@ export const api = {
       const qs = params.toString();
       return get<ActivityEvent[]>(`/events${qs ? `?${qs}` : ''}`);
     },
+  },
+  fleet: {
+    run: (b: RunFleetOperationInput) => post<FleetRun>('/fleet/run', b),
   },
   apiTokens: {
     list: () => get<ApiToken[]>('/api-tokens'),

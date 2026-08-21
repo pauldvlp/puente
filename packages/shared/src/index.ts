@@ -12,6 +12,7 @@ export * from './alerts.js';
 export * from './workspace.js';
 export * from './backup.js';
 export * from './api-token.js';
+export * from './fleet.js';
 
 /** API route prefix for every backend endpoint. */
 export const API_PREFIX = '/api';

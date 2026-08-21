@@ -348,6 +348,34 @@ export class NodesService {
     return this.refreshStatus(id);
   }
 
+  /**
+   * Reinstall the connector binary at the latest version and restart it.
+   *
+   * `ensureInstalled` skips the download when it already knows a version, so upgrading means
+   * asking it as though nothing were installed. Free — keeping software current is not something
+   * to sell; doing it to a whole fleet in one action is (see ee/fleet).
+   */
+  async upgradeConnector(id: string): Promise<Node> {
+    const row = this.getRow(id);
+    if (!row.tunnelId) {
+      throw new BadRequestException(`"${row.name}" has no connector to upgrade yet.`);
+    }
+    const version = await this.withTarget(row, async (target) => {
+      const { version } = await this.cloudflared.ensureInstalled(target, null);
+      await this.cloudflared.controlService(target, 'restart').catch(() => undefined);
+      return version;
+    });
+    if (version) this.setState(id, { cloudflaredVersion: version });
+    this.events.success(
+      'node.upgrade',
+      `Connector on "${row.name}" is now ${version ?? 'updated'}`,
+      {
+        nodeId: id,
+      },
+    );
+    return this.refreshStatus(id);
+  }
+
   async refreshStatus(id: string): Promise<Node> {
     const row = this.getRow(id);
     // Live tunnel status from Cloudflare (no SSH needed).
