@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { FleetActions } from '../ee/FleetActions';
 import { Link } from 'react-router-dom';
 import { Plus, Server } from 'lucide-react';
 import { useNodes, useRoutes, useZones, useCloudflareConnection } from '../lib/hooks';
@@ -41,6 +42,8 @@ export function NodesPage() {
           Add node
         </Button>
       </header>
+
+      <FleetActions nodeCount={(nodes.data ?? []).length} />
 
       {!cfConnected && (
         <div className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-warning/12 px-4 py-3">
