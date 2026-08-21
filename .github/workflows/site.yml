@@ -30,7 +30,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # `enablement` turns Pages on the first time this runs, so nobody has to click through
+      # Settings. Without it the action fails with "Get Pages site failed... Not Found", which is
+      # a red X on a public repo that reads as "this project is broken".
       - uses: actions/configure-pages@v6
+        with:
+          enablement: true
 
       - name: Upload docs/
         uses: actions/upload-pages-artifact@v5
