@@ -166,6 +166,20 @@ CREATE TABLE IF NOT EXISTS api_tokens (
   expires_at INTEGER
 );
 
+CREATE TABLE IF NOT EXISTS sso_config (
+  id TEXT PRIMARY KEY,
+  enabled INTEGER NOT NULL DEFAULT 0,
+  label TEXT NOT NULL DEFAULT 'SSO',
+  issuer TEXT NOT NULL DEFAULT '',
+  client_id TEXT NOT NULL DEFAULT '',
+  client_secret_enc TEXT,
+  allowed_domain TEXT NOT NULL DEFAULT '',
+  default_role TEXT NOT NULL DEFAULT 'viewer',
+  last_error TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_routes_node ON routes(node_id);
 CREATE INDEX IF NOT EXISTS idx_events_ts ON events(ts);
 `;

@@ -9,6 +9,7 @@ interface AuthContextValue {
   login: (input: LoginInput) => Promise<void>;
   register: (input: RegisterAdminInput) => Promise<void>;
   logout: () => void;
+  completeSso: (code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -40,6 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
   }, []);
 
+  /** Swap the one-time code the SSO callback put in the URL for a session. */
+  const completeSso = useCallback(async (code: string) => {
+    const res = await api.sso.exchange({ code });
+    setToken(res.token);
+    setUser(res.user);
+  }, []);
+
   const logout = useCallback(() => {
     clearToken();
     setUser(null);
@@ -47,7 +55,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, isAuthenticated: Boolean(user), login, register, logout }}
+      value={{
+        user,
+        loading,
+        isAuthenticated: Boolean(user),
+        login,
+        register,
+        logout,
+        completeSso,
+      }}
     >
       {children}
     </AuthContext.Provider>
