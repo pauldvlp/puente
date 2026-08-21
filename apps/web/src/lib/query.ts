@@ -24,6 +24,7 @@ export const qk = {
   alertChannels: ['alert-channels'] as const,
   workspaces: ['workspaces'] as const,
   team: ['team'] as const,
+  apiTokens: ['api-tokens'] as const,
   backupSchedule: ['backup-schedule'] as const,
   backupFiles: ['backup-files'] as const,
 };
