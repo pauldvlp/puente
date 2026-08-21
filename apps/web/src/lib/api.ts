@@ -8,6 +8,9 @@ import {
   type CreateNodeInput,
   type CreateRouteInput,
   type ActivateLicenseInput,
+  type CreateTeamMemberInput,
+  type TeamMember,
+  type UpdateTeamMemberInput,
   type AlertChannel,
   type AlertDelivery,
   type CreateAlertChannelInput,
@@ -162,6 +165,12 @@ export const api = {
   },
   events: {
     list: () => get<ActivityEvent[]>('/events'),
+  },
+  team: {
+    list: () => get<TeamMember[]>('/team'),
+    create: (b: CreateTeamMemberInput) => post<TeamMember>('/team', b),
+    update: (id: string, b: UpdateTeamMemberInput) => patch<TeamMember>(`/team/${id}`, b),
+    remove: (id: string) => del<{ ok: true }>(`/team/${id}`),
   },
   workspaces: {
     list: () => get<Workspace[]>('/workspaces'),
