@@ -139,8 +139,11 @@ function RouteRow({
       <Badge variant="muted" className="hidden sm:inline-flex">
         {nodeName}
       </Badge>
-      <StatusBadge meta={routeStatusMeta(route.status)} dot />
-      <StatusBadge meta={routeHealthMeta(route.health)} />
+      {/* On a phone the row cannot hold both badges without eating the hostname, and a route you
+          cannot name is a health signal you cannot act on. "Active" is the one that can go: it
+          repeats what publishing the route already implied. */}
+      <StatusBadge meta={routeStatusMeta(route.status)} dot className="hidden sm:inline-flex" />
+      <StatusBadge meta={routeHealthMeta(route.health)} title={route.lastError ?? undefined} />
 
       <div className="flex items-center gap-1">
         <Button

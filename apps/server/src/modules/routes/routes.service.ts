@@ -16,6 +16,7 @@ import { CloudflareService, type IngressRule } from '../cloudflare/cloudflare.se
 import { SettingsService } from '../settings/settings.service';
 import { WorkspacesService } from '../workspaces/workspaces.service';
 import { nodes, routes, type NodeRow, type RouteRow } from '../../db/schema';
+import { classifyProbe } from './probe';
 import { newId } from '../../common/ids';
 import { nowMs, toIso, toIsoStrict } from '../../common/time';
 
@@ -256,9 +257,7 @@ export class RoutesService {
       });
       clearTimeout(timer);
       httpStatus = res.status;
-      // 502/503/504 from the edge means the tunnel/origin is down.
-      health = res.status >= 502 && res.status <= 504 ? 'unhealthy' : 'healthy';
-      message = `HTTP ${res.status}`;
+      ({ health, message } = classifyProbe(res.status));
     } catch (err) {
       health = 'unhealthy';
       message = err instanceof Error ? err.message : String(err);
@@ -283,6 +282,30 @@ export class RoutesService {
     }
     this.emitUpdated(id);
     return { health, httpStatus, message, checkedAt: toIsoStrict(checkedAt) };
+  }
+
+  /**
+   * Re-probe every published route. Called by the poller, so it runs outside any request: no
+   * workspace is in scope and none is assumed — every route of every workspace is watched, the
+   * same way `pollTunnelStatuses` watches every node.
+   *
+   * Sequential on purpose. A probe waits up to 10s, and firing a handful of them at a stranger's
+   * edge all at once buys nothing; the next tick is scheduled after this finishes, never during.
+   */
+  async pollHealth(): Promise<void> {
+    const due = this.db
+      .select()
+      .from(routes)
+      .all()
+      .filter((r) => r.enabled && r.status === 'active');
+    for (const row of due) {
+      try {
+        await this.check(row.id);
+      } catch (err) {
+        // A route that cannot be probed is not a reason to stop watching the rest.
+        this.logger.debug(`health poll failed for ${row.hostname}: ${String(err)}`);
+      }
+    }
   }
 
   private patch(id: string, patch: Partial<RouteRow>): void {
