@@ -53,9 +53,20 @@ const TONE_DOT: Record<Tone, string> = {
   neutral: 'bg-muted-foreground/60',
 };
 
-export function StatusBadge({ meta, dot }: { meta: StatusMeta; dot?: boolean }) {
+export function StatusBadge({
+  meta,
+  dot,
+  title,
+  className,
+}: {
+  meta: StatusMeta;
+  dot?: boolean;
+  /** Hover text — used to say *why* something is unhealthy without widening the row. */
+  title?: string;
+  className?: string;
+}) {
   return (
-    <Badge variant={TONE_BADGE[meta.tone]} className="gap-1.5">
+    <Badge variant={TONE_BADGE[meta.tone]} className={cn('gap-1.5', className)} title={title}>
       {dot && (
         <span
           className={cn(
