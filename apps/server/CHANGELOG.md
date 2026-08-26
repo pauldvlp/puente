@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.4.0](https://github.com/pauldvlp/puente/compare/v0.3.0...v0.4.0) (2026-08-26)
+
+
+### ✨ Features
+
+* **audit:** record who did what, let anyone search it, sell the export ([8f411e9](https://github.com/pauldvlp/puente/commit/8f411e9ebdbadf78a4d0812ec68b820b8ed35389))
+* **auth:** give accounts a role, and make every write need one ([7a8e3e9](https://github.com/pauldvlp/puente/commit/7a8e3e97877b5488649d2d5e18592062e0b8b733))
+* **backup:** back the whole install up, and bring it back ([c8a0f2a](https://github.com/pauldvlp/puente/commit/c8a0f2ae91cf8e6b414d71e15bcd862392b87366))
+* **backup:** run backups on a schedule, and prune the old ones ([38bb22e](https://github.com/pauldvlp/puente/commit/38bb22e26453a9eebb2d8ab8189257574dce0aee))
+* **fleet:** update every connector, one machine at a time ([6b9ec81](https://github.com/pauldvlp/puente/commit/6b9ec81df6f34d9cf23db222aa2273e3f71c7790))
+* **routes:** keep watching a route after you publish it ([a40ae98](https://github.com/pauldvlp/puente/commit/a40ae98f90f8e19e145b55849f816b052e276608))
+* **sso:** sign in with the identity provider the company already has ([1a9f1ac](https://github.com/pauldvlp/puente/commit/1a9f1ac9d48ec3b563df6c695c09fe767440388d))
+* **team:** sell the second account, with seats read off the licence ([62fb09f](https://github.com/pauldvlp/puente/commit/62fb09ff73ca43dd369108ef36c62f38bd03da7d))
+* **tokens:** let a script drive puente, with a role of its own ([293a22c](https://github.com/pauldvlp/puente/commit/293a22c50daf14d55e1a3e65a929835709ecfb4c))
+* **workspaces:** run several client Cloudflare accounts side by side ([b7f8a1c](https://github.com/pauldvlp/puente/commit/b7f8a1c83f97dfd7e131f6ff21219f5a5e0bd296))
+
+
+### 🐛 Bug Fixes
+
+* **nodes:** only tear a connector down on a node that had one ([cf66c46](https://github.com/pauldvlp/puente/commit/cf66c46e78780a2b933d39daf663ed2158b3a351))
+* **nodes:** stop reporting a connector that is not running ([3a0099e](https://github.com/pauldvlp/puente/commit/3a0099e2458e49a791227ae82390c24c784cabb5))
+
 ## [0.3.0](https://github.com/pauldvlp/puente/compare/v0.2.0...v0.3.0) (2026-08-21)
 
 
