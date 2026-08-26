@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { execFile, spawn, type ChildProcess } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -30,16 +30,28 @@ let dataDir: string;
 let stubBin: string;
 
 /**
- * A `systemctl` that knows about nothing, ahead of the real one on PATH.
+ * Stubs ahead of the real binaries on PATH.
  *
- * Pins the run to the branch that was broken — the one taken on every machine whose connector
- * is not a service unit, which is exactly the state a node lands in when provisioning leaves no
- * unit behind. Without it a host that happens to have `cloudflared.service` answers from
- * systemd and never reaches the process check at all.
+ * `systemctl` knows about nothing, which pins the run to the branch that was broken — the one
+ * taken on every machine whose connector is not a service unit, exactly the state a node lands
+ * in when provisioning leaves no unit behind. Without it a host that happens to have
+ * `cloudflared.service` answers from systemd and never reaches the process check at all.
+ *
+ * `cloudflared` records what it was asked to do and does nothing, so a test can assert on the
+ * machine the server tried to touch. It also keeps this suite from reaching for the real one:
+ * running it against a developer's own machine used to uninstall their connector.
  */
-function stubSystemctl(dir: string): void {
+function stubBinaries(dir: string): void {
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'systemctl'), '#!/bin/sh\nexit 1\n', { mode: 0o755 });
+  writeFileSync(join(dir, 'cloudflared'), `#!/bin/sh\necho "$@" >> ${join(dir, 'calls.log')}\n`, {
+    mode: 0o755,
+  });
+}
+
+function cloudflaredCalls(): string {
+  const log = join(stubBin, 'calls.log');
+  return existsSync(log) ? readFileSync(log, 'utf8') : '';
 }
 
 /**
@@ -106,7 +118,7 @@ test.beforeAll(async () => {
   dataDir = mkdtempSync(join(tmpdir(), 'puente-connector-state-'));
   mkdirSync(dataDir, { recursive: true });
   stubBin = join(dataDir, 'stub-bin');
-  stubSystemctl(stubBin);
+  stubBinaries(stubBin);
 
   // First boot only to let the migration runner create today's schema.
   const scaffold = boot();
@@ -166,4 +178,37 @@ test('and the API agrees with the machine', async () => {
   const node = nodes.find((n) => n.name === 'claims-to-run');
   expect(node).toBeDefined();
   expect(node!.connectorRunState).toBe(truth ? 'running' : 'stopped');
+});
+
+test("removing a node it never provisioned leaves the machine's connector alone", async () => {
+  // Teardown ran unprompted on delete, so a node puente had only ever been told about — no
+  // tunnel, never provisioned — still took `cloudflared service uninstall` to the machine. That
+  // is how this repo's own e2e suite kept wiping the connector of whoever ran it.
+  const login = await fetch(`http://127.0.0.1:${PORT}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: USER, password: PASS }),
+  });
+  const { token } = (await login.json()) as { token: string };
+  const auth = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+  const del = (id: string): Promise<Response> =>
+    fetch(`http://127.0.0.1:${PORT}/api/nodes/${id}`, { method: 'DELETE', headers: auth });
+
+  // A node puente did provision still gets its connector torn down — and this proves the stub
+  // sees the teardown at all, so the assertion below cannot pass by measuring nothing.
+  const seeded = cloudflaredCalls().length;
+  expect((await del('node_claim')).ok).toBe(true);
+  expect(cloudflaredCalls().slice(seeded)).toContain('service uninstall');
+
+  const created = await fetch(`http://127.0.0.1:${PORT}/api/nodes`, {
+    method: 'POST',
+    headers: auth,
+    body: JSON.stringify({ name: 'never-provisioned', kind: 'local' }),
+  });
+  expect(created.ok, `create failed: ${await created.clone().text()}`).toBe(true);
+  const { id } = (await created.json()) as { id: string };
+
+  const before = cloudflaredCalls().length;
+  expect((await del(id)).ok).toBe(true);
+  expect(cloudflaredCalls().slice(before)).not.toContain('service uninstall');
 });

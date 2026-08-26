@@ -150,13 +150,18 @@ export class NodesService {
 
   async remove(id: string): Promise<void> {
     const row = this.getRow(id);
-    // Best-effort teardown of the connector + tunnel.
-    try {
-      await this.withTarget(row, async (target) => {
-        await this.cloudflared.uninstallConnector(target);
-      });
-    } catch (err) {
-      this.logger.warn(`Connector teardown failed for ${row.name}: ${String(err)}`);
+    // Best-effort teardown, but only of a connector puente actually put there. Without a tunnel
+    // this node was never provisioned, and tearing down anyway ran `cloudflared service uninstall`
+    // on the machine — removing a connector someone else installed, for a node that had never
+    // touched it. On a local node that is the user's own tunnel, and it went down for good.
+    if (row.tunnelId) {
+      try {
+        await this.withTarget(row, async (target) => {
+          await this.cloudflared.uninstallConnector(target);
+        });
+      } catch (err) {
+        this.logger.warn(`Connector teardown failed for ${row.name}: ${String(err)}`);
+      }
     }
     await this.routes.removeForNode(id).catch((e) => this.logger.warn(String(e)));
     if (row.tunnelId) {
