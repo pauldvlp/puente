@@ -305,14 +305,25 @@ export class NodesService {
       const conn = await this.cloudflared.installConnector(target, token);
       if (conn.note) this.events.warn('node.provision', conn.note, { nodeId: id });
 
+      // Ask the machine rather than assuming: taking the install at its word is
+      // what let a node report "Running" while nothing was connected at all.
+      const runState = await this.cloudflared.runState(target);
       this.setState(id, {
         serviceInstalled: conn.serviceInstalled,
         provisionState: 'provisioned',
-        connectorRunState: 'running',
+        connectorRunState: runState,
         lastSeenAt: nowMs(),
         lastError: null,
       });
-      this.events.success('node.provision', `Node "${row.name}" is live`, { nodeId: id });
+      if (runState === 'running') {
+        this.events.success('node.provision', `Node "${row.name}" is live`, { nodeId: id });
+      } else {
+        this.events.warn(
+          'node.provision',
+          `Node "${row.name}" is set up, but its connector is not running.`,
+          { nodeId: id },
+        );
+      }
       this.bus.progress(scope, 'done', 'Node ready', { done: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
