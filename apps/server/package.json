@@ -59,7 +59,7 @@
     "cloudflare": "^6.0.0",
     "commander": "^13.0.0",
     "drizzle-orm": "^0.45.0",
-    "jose": "6.2.9",
+    "jose": "6.2.10",
     "node-ssh": "^13.2.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
