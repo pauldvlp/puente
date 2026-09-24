@@ -50,20 +50,20 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@nestjs/common": "^11.2.1",
-    "@nestjs/core": "^11.2.1",
+    "@nestjs/common": "^11.2.5",
+    "@nestjs/core": "^11.2.5",
     "@nestjs/jwt": "^11.0.0",
-    "@nestjs/platform-express": "^11.2.1",
+    "@nestjs/platform-express": "^11.2.5",
     "@nestjs/serve-static": "^5.0.0",
     "better-sqlite3": "^12.0.0",
     "cloudflare": "^6.0.0",
     "commander": "^13.0.0",
-    "drizzle-orm": "^0.45.0",
-    "jose": "6.2.9",
+    "drizzle-orm": "^0.45.3",
+    "jose": "6.2.12",
     "node-ssh": "^13.2.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "ssh-config": "^5.2.1",
+    "ssh-config": "^5.3.0",
     "ssh2": "^1.17.0",
     "zod": "^3.24.1"
   },
@@ -72,9 +72,9 @@
     "@nestjs/schematics": "^11.0.0",
     "@puente/shared": "workspace:*",
     "@types/better-sqlite3": "^7.6.11",
-    "@types/node": "^22.10.5",
-    "@types/ssh2": "^1.15.5",
-    "drizzle-kit": "^0.31.0",
+    "@types/node": "^22.20.4",
+    "@types/ssh2": "^1.15.6",
+    "drizzle-kit": "^0.31.11",
     "typescript": "^5.7.3"
   }
 }
